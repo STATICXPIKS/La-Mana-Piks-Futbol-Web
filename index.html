@@ -3,338 +3,760 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>La Maña Piks - Premier League Analytics</title>
+  <title>LA MAÑA PICKS · Modelos Cuantitativos Fútbol IA</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .cyan-glow { box-shadow: 0 0 18px rgba(6, 182, 212, 0.45); }
+    .card-dark { background: linear-gradient(180deg, #0b1120 0%, #070b14 100%); border: 1px solid #1e293b; }
+    .card-dark:hover { border-color: rgba(6, 182, 212, 0.55); }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
-  <!-- Header -->
-  <header class="bg-slate-900 border-b border-emerald-500/30 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400 font-bold text-xl">
-          ⚽
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight text-white">LA MAÑA PIKS <span class="text-emerald-400">PREMIER LEAGUE</span></h1>
-          <p class="text-xs text-slate-400">Motor Cuantitativo Dual: Mercado (Cuotas) vs. Rendimiento Deportivo y Extra-Cancha</p>
-        </div>
+<body class="bg-slate-50 text-slate-900 min-h-screen transition-colors duration-300" id="appBody">
+
+  <!-- ==================== VISTA 1: HUB PRINCIPAL DE LIGAS (ESTILO IMAGEN 5) ==================== -->
+  <div id="viewHub" class="min-h-screen flex flex-col">
+    <!-- Navbar Blanco Superior -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl font-black tracking-tight text-slate-900">LA MAÑA <span class="text-emerald-500">PICKS</span></span>
+        <span class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">FÚTBOL</span>
       </div>
-      <div class="flex gap-2">
-        <button onclick="cargarJornada()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition">
-          Actualizar Jornada
-        </button>
+      <div class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold tracking-wider flex items-center gap-2 shadow-sm">
+        <span class="text-slate-400">MODELO:</span>
+        <span class="text-emerald-400">DIXON-COLES + MC 25K</span>
+      </div>
+    </nav>
+
+    <!-- Hero Hub Central -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">
+          MODELOS CUANTITATIVOS <span class="text-emerald-500">IA</span>
+        </h1>
+        <p class="text-slate-500 text-sm sm:text-base mt-2">
+          Simulaciones Monte Carlo (25,000 iteraciones), Dixon-Coles, Elo Dinámico, xG y auditoría independiente de mercado vs. cancha.
+        </p>
+      </div>
+
+      <!-- Grid de Tarjetas de Ligas -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- TARJETA ACTIVA: PREMIER LEAGUE -->
+        <div class="bg-white rounded-3xl border-2 border-emerald-500 p-6 shadow-lg flex flex-col justify-between transition hover:-translate-y-1">
+          <div>
+            <div class="flex justify-center">
+              <span class="bg-slate-900 text-emerald-400 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
+                ENG · PREMIER LEAGUE
+              </span>
+            </div>
+            <h2 class="text-center text-xl font-black text-slate-900 mt-3">PREMIER-IA</h2>
+            <p class="text-center text-xs text-slate-400 mt-0.5">Dixon-Coles, xG, Elo y Cuotas EV+</p>
+
+            <!-- Escudo / Visual Central -->
+            <div class="my-6 flex flex-col items-center justify-center">
+              <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 flex items-center justify-center p-3">
+                <img src="https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" alt="Premier League" class="w-16 h-16 object-contain" />
+              </div>
+              <div class="grid grid-cols-2 gap-2 w-full mt-4 text-center">
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-2">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">EQUIPOS</div>
+                  <div class="text-sm font-black text-emerald-600">20 REALES</div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-2">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">SIMS</div>
+                  <div class="text-sm font-black text-slate-800">25,000</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="abrirLiga('premier')" class="w-full py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs tracking-wider uppercase shadow-md transition">
+            ENTRAR A LA CANCHA ⚽
+          </button>
+        </div>
+
+        <!-- TARJETA PRÓXIMAMENTE 1: CHAMPIONS LEAGUE -->
+        <div class="bg-white rounded-3xl border-2 border-sky-400/60 p-6 shadow-sm flex flex-col justify-between opacity-75">
+          <div>
+            <div class="flex justify-center">
+              <span class="bg-slate-900 text-sky-400 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
+                UEFA · CHAMPIONS
+              </span>
+            </div>
+            <h2 class="text-center text-xl font-black text-slate-900 mt-3">EUROPA-IA</h2>
+            <p class="text-center text-xs text-slate-400 mt-0.5">Fase de Liga y Eliminatorias</p>
+            <div class="my-6 flex flex-col items-center justify-center">
+              <div class="w-24 h-24 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center p-3">
+                <img src="https://a.espncdn.com/i/leaguelogos/soccer/500/2.png" alt="Champions" class="w-16 h-16 object-contain" />
+              </div>
+              <div class="mt-4 text-center text-xs font-semibold text-slate-400">Módulo en calibración</div>
+            </div>
+          </div>
+          <button disabled class="w-full py-3 rounded-full bg-sky-500/40 text-white font-extrabold text-xs tracking-wider uppercase cursor-not-allowed">
+            PRÓXIMAMENTE 🏆
+          </button>
+        </div>
+
+        <!-- TARJETA PRÓXIMAMENTE 2: LALIGA -->
+        <div class="bg-white rounded-3xl border-2 border-orange-400/60 p-6 shadow-sm flex flex-col justify-between opacity-75">
+          <div>
+            <div class="flex justify-center">
+              <span class="bg-slate-900 text-orange-400 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
+                ESP · LALIGA
+              </span>
+            </div>
+            <h2 class="text-center text-xl font-black text-slate-900 mt-3">IBERIA-IA</h2>
+            <p class="text-center text-xs text-slate-400 mt-0.5">Posesión, xG y Hándicaps</p>
+            <div class="my-6 flex flex-col items-center justify-center">
+              <div class="w-24 h-24 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center p-3">
+                <img src="https://a.espncdn.com/i/leaguelogos/soccer/500/15.png" alt="LaLiga" class="w-16 h-16 object-contain" />
+              </div>
+              <div class="mt-4 text-center text-xs font-semibold text-slate-400">Módulo en calibración</div>
+            </div>
+          </div>
+          <button disabled class="w-full py-3 rounded-full bg-orange-500/40 text-white font-extrabold text-xs tracking-wider uppercase cursor-not-allowed">
+            PRÓXIMAMENTE 🇪🇸
+          </button>
+        </div>
+
+        <!-- TARJETA PRÓXIMAMENTE 3: LIGA MX -->
+        <div class="bg-white rounded-3xl border-2 border-amber-400/60 p-6 shadow-sm flex flex-col justify-between opacity-75">
+          <div>
+            <div class="flex justify-center">
+              <span class="bg-slate-900 text-amber-400 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
+                MEX · LIGA MX
+              </span>
+            </div>
+            <h2 class="text-center text-xl font-black text-slate-900 mt-3">AZTECA-IA</h2>
+            <p class="text-center text-xs text-slate-400 mt-0.5">Factor Localía, Altura y Totales</p>
+            <div class="my-6 flex flex-col items-center justify-center">
+              <div class="w-24 h-24 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center p-3">
+                <img src="https://a.espncdn.com/i/leaguelogos/soccer/500/22.png" alt="Liga MX" class="w-16 h-16 object-contain" />
+              </div>
+              <div class="mt-4 text-center text-xs font-semibold text-slate-400">Módulo en calibración</div>
+            </div>
+          </div>
+          <button disabled class="w-full py-3 rounded-full bg-amber-500/40 text-white font-extrabold text-xs tracking-wider uppercase cursor-not-allowed">
+            PRÓXIMAMENTE 🇲🇽
+          </button>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== VISTA 2: DASHBOARD INTERNO PREMIER LEAGUE (ESTILO IMÁGENES 1, 2, 3, 4 Y 6) ==================== -->
+  <div id="viewLeague" class="hidden min-h-screen bg-[#050811] text-slate-100 pb-16">
+    
+    <!-- Barra Superior -->
+    <div class="border-b border-slate-800/80 bg-[#070b14]/90 backdrop-blur sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <button onclick="volverHub()" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 transition">
+            ← Ligas
+          </button>
+          <div class="flex items-center gap-2">
+            <img src="https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" class="w-6 h-6 object-contain" />
+            <span class="font-black tracking-wide text-white text-sm sm:text-base">PREMIER LEAGUE <span class="text-cyan-400">· PREMIER-IA</span></span>
+          </div>
+        </div>
+
+        <!-- Menú Pill de 4 Pestañas (Estilo exacto Imagen 1-4) -->
+        <div class="inline-flex items-center bg-[#0b1120] border border-slate-800 rounded-full p-1 gap-1">
+          <button onclick="cambiarTab('partidos')" id="tabBtn-partidos" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition bg-cyan-400 text-slate-950 cyan-glow">
+            PARTIDOS
+          </button>
+          <button onclick="cambiarTab('simulador')" id="tabBtn-simulador" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
+            SIMULADOR
+          </button>
+          <button onclick="cambiarTab('noticias')" id="tabBtn-noticias" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
+            NOTICIAS
+          </button>
+          <button onclick="cambiarTab('equipos')" id="tabBtn-equipos" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
+            EQUIPOS
+          </button>
+        </div>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
-    <!-- Simulador de Cruce Personalizado -->
-    <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
-      <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-400 mb-3">Simulador Manual de Partidos (25,000 Iteraciones Monte Carlo)</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <select id="selectLocal" class="bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
-          <option value="">Selecciona Equipo Local...</option>
-        </select>
-        <select id="selectVisita" class="bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
-          <option value="">Selecciona Equipo Visitante...</option>
-        </select>
-        <button onclick="simularCruce()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl px-4 py-2.5 text-sm transition">
-          Analizar Cruce Independiente
-        </button>
+    <div class="max-w-7xl mx-auto px-4 pt-6">
+      
+      <!-- Loader -->
+      <div id="leagueLoader" class="text-center py-20">
+        <div class="inline-block w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p class="text-cyan-300 text-sm font-semibold tracking-wide">Sincronizando datos reales de Premier League (Dixon-Coles, Cuotas, Tabla y RSS)...</p>
       </div>
-    </section>
 
-    <!-- Estado de Carga -->
-    <div id="loader" class="text-center py-12">
-      <div class="inline-block w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-      <p class="text-slate-300 font-medium">Descargando estadísticas reales, cuotas, tabla y noticias de la Premier League...</p>
-      <p class="text-xs text-slate-500 mt-1">(Si el servidor gratuito en Render estaba dormido, puede tardar ~40 segundos en despertar)</p>
+      <!-- ==================== PESTAÑA 1: PARTIDOS (ESTILO IMAGEN 1) ==================== -->
+      <div id="tab-partidos" class="hidden space-y-6">
+        <!-- Pills de Fechas -->
+        <div id="fechasPills" class="flex flex-wrap items-center gap-2"></div>
+
+        <!-- Ranking del Día · Mejores Picks -->
+        <div class="card-dark rounded-2xl p-5">
+          <div class="text-xs font-extrabold uppercase tracking-widest text-cyan-400 mb-4">
+            RANKING DEL DÍA · MEJORES PICKS (ANÁLISIS DEPORTIVO PURO)
+          </div>
+          <div id="rankingDiaList" class="divide-y divide-slate-800/70"></div>
+        </div>
+
+        <!-- Grid de Tarjetas de Partidos -->
+        <div id="partidosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      </div>
+
+      <!-- ==================== PESTAÑA 2: SIMULADOR (ESTILO IMÁGENES 2 Y 6) ==================== -->
+      <div id="tab-simulador" class="hidden space-y-6">
+        <!-- Selectores Local y Visitante -->
+        <div class="card-dark rounded-2xl p-5">
+          <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
+            <div class="md:col-span-5">
+              <label class="block text-[11px] font-extrabold uppercase tracking-wider text-cyan-400 mb-1.5">LOCAL 🏠</label>
+              <select id="simSelectLocal" onchange="actualizarPreviewEscudos()" class="w-full bg-[#060913] border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm font-semibold text-white outline-none"></select>
+            </div>
+            <div class="md:col-span-1 text-center font-black text-slate-500 pb-3">VS</div>
+            <div class="md:col-span-5">
+              <label class="block text-[11px] font-extrabold uppercase tracking-wider text-cyan-400 mb-1.5">VISITANTE ✈️</label>
+              <select id="simSelectVisita" onchange="actualizarPreviewEscudos()" class="w-full bg-[#060913] border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm font-semibold text-white outline-none"></select>
+            </div>
+          </div>
+
+          <!-- Banner Oscuro con Escudos Reales Enfrentados (Estilo Imagen 6) -->
+          <div class="mt-5 bg-[#03050a] border border-slate-800/90 rounded-2xl py-7 px-4 flex flex-col sm:flex-row items-center justify-around gap-6">
+            <div class="flex flex-col items-center text-center">
+              <img id="simEscudoLocal" src="" alt="Local" class="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.35)]" />
+              <span id="simNombreLocal" class="mt-3 font-extrabold text-sm sm:text-base text-white tracking-wide">-</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-3">
+              <span class="text-2xl font-black italic text-emerald-400 tracking-widest">VS</span>
+              <button onclick="ejecutarSimulacion()" class="px-6 py-2.5 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs uppercase tracking-wider cyan-glow transition">
+                SIMULAR ENCUENTRO ▶
+              </button>
+            </div>
+
+            <div class="flex flex-col items-center text-center">
+              <img id="simEscudoVisita" src="" alt="Visita" class="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.35)]" />
+              <span id="simNombreVisita" class="mt-3 font-extrabold text-sm sm:text-base text-white tracking-wide">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resultado de Simulación -->
+        <div id="simResultadoContainer"></div>
+      </div>
+
+      <!-- ==================== PESTAÑA 3: NOTICIAS Y BAJAS (ESTILO IMAGEN 3) ==================== -->
+      <div id="tab-noticias" class="hidden">
+        <div class="card-dark rounded-2xl p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-800">
+            <div>
+              <h2 class="text-xs font-extrabold uppercase tracking-widest text-cyan-400">NOTICIAS, BAJAS Y ALERTAS EXTRA-CANCHA · PREMIER LEAGUE</h2>
+              <p class="text-xs text-slate-400 mt-1">Reporte oficial de lesionados/suspendidos por club y titulares recientes de BBC Sport / Sky Sports</p>
+            </div>
+          </div>
+          <div id="noticiasListContainer" class="divide-y divide-slate-800/70 mt-2"></div>
+        </div>
+      </div>
+
+      <!-- ==================== PESTAÑA 4: EQUIPOS / TABLA (ESTILO IMAGEN 4) ==================== -->
+      <div id="tab-equipos" class="hidden">
+        <div class="card-dark rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 text-[11px] font-extrabold uppercase tracking-wider text-cyan-400 bg-[#080d1a]">
+                  <th class="py-3.5 px-4">POS · EQUIPO</th>
+                  <th class="py-3.5 px-3 text-center">JJ</th>
+                  <th class="py-3.5 px-3 text-center">G-E-P</th>
+                  <th class="py-3.5 px-3 text-center">GF</th>
+                  <th class="py-3.5 px-3 text-center">GC</th>
+                  <th class="py-3.5 px-3 text-center">DIF</th>
+                  <th class="py-3.5 px-3 text-center">GF/J</th>
+                  <th class="py-3.5 px-3 text-center">GC/J</th>
+                  <th class="py-3.5 px-3 text-center">PTS</th>
+                  <th class="py-3.5 px-4 text-right">PYTH %</th>
+                </tr>
+              </thead>
+              <tbody id="tablaEquiposBody" class="divide-y divide-slate-800/60 text-xs"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <!-- Contenedor de Resultados -->
-    <div id="contenedorPartidos" class="space-y-8 hidden"></div>
-  </main>
+  <!-- ==================== MODAL DETALLE COMPLETO (LOS 2 ANÁLISIS SEPARADOS) ==================== -->
+  <div id="modalDetalle" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-[#090e1a] border border-cyan-500/40 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div id="modalTitulo" class="text-lg font-black text-white">Análisis Detallado</div>
+        <button onclick="cerrarModal()" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">✕ CERRAR</button>
+      </div>
+      <div id="modalContenido"></div>
+    </div>
+  </div>
 
   <script>
     const API_BASE = "https://la-mana-piks-futbol.onrender.com";
-    const EQUIPOS_PL = [
-      "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
-      "Chelsea", "Coventry", "Crystal Palace", "Everton", "Fulham",
-      "Hull", "Ipswich", "Leeds", "Liverpool", "Man City",
-      "Man United", "Newcastle", "Nott'm Forest", "Sunderland", "Tottenham"
-    ];
 
-    const selL = document.getElementById("selectLocal");
-    const selV = document.getElementById("selectVisita");
-    EQUIPOS_PL.forEach(eq => {
-      selL.innerHTML += `<option value="${eq}">${eq}</option>`;
-      selV.innerHTML += `<option value="${eq}">${eq}</option>`;
-    });
+    // Diccionario de escudos reales oficiales (ESPN CDN) de los 20 equipos actuales
+    const ESCUDOS_PL = {
+      "Arsenal": { nombre: "Arsenal", abbr: "ARS", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/359.png" },
+      "Aston Villa": { nombre: "Aston Villa", abbr: "AVL", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/362.png" },
+      "Bournemouth": { nombre: "AFC Bournemouth", abbr: "BOU", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/349.png" },
+      "Brentford": { nombre: "Brentford", abbr: "BRE", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/337.png" },
+      "Brighton": { nombre: "Brighton & Hove Albion", abbr: "BHA", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/331.png" },
+      "Chelsea": { nombre: "Chelsea", abbr: "CHE", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/363.png" },
+      "Coventry": { nombre: "Coventry City FC", abbr: "COV", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/388.png" },
+      "Crystal Palace": { nombre: "Crystal Palace", abbr: "CRY", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/384.png" },
+      "Everton": { nombre: "Everton", abbr: "EVE", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/368.png" },
+      "Fulham": { nombre: "Fulham", abbr: "FUL", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/370.png" },
+      "Hull": { nombre: "Hull City", abbr: "HUL", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/306.png" },
+      "Ipswich": { nombre: "Ipswich Town", abbr: "IPS", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/373.png" },
+      "Leeds": { nombre: "Leeds United", abbr: "LEE", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/357.png" },
+      "Liverpool": { nombre: "Liverpool", abbr: "LIV", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/364.png" },
+      "Man City": { nombre: "Manchester City", abbr: "MCI", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/382.png" },
+      "Man United": { nombre: "Manchester United", abbr: "MUN", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/360.png" },
+      "Newcastle": { nombre: "Newcastle United", abbr: "NEW", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/361.png" },
+      "Nott'm Forest": { nombre: "Nottingham Forest", abbr: "NFO", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/393.png" },
+      "Sunderland": { nombre: "Sunderland", abbr: "SUN", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/366.png" },
+      "Tottenham": { nombre: "Tottenham Hotspur", abbr: "TOT", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/367.png" }
+    };
 
-    function renderTarjetaPartido(info, mercado, deportivo) {
-      const mc = deportivo.simulacion_monte_carlo;
-      const elo = deportivo.fuerzas_y_elo_dinamico;
-      const hist = deportivo.estadisticas_historicas_y_forma;
-      const extra = deportivo.factores_extra_cancha;
-      const tact = deportivo.estilos_de_juego_y_neutralizacion;
+    let jornadaCache = [];
+    let ligaInfoCache = { tabla_posiciones: [], noticias_liga: [] };
+
+    function getTeamMeta(key) {
+      return ESCUDOS_PL[key] || { nombre: key, abbr: key.slice(0, 3).toUpperCase(), logo: "https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" };
+    }
+
+    function abrirLiga(liga) {
+      document.getElementById("viewHub").classList.add("hidden");
+      document.getElementById("viewLeague").classList.remove("hidden");
+      inicializarSelectoresSimulador();
+      cargarTodoPremier();
+    }
+
+    function volverHub() {
+      document.getElementById("viewLeague").classList.add("hidden");
+      document.getElementById("viewHub").classList.remove("hidden");
+    }
+
+    function cambiarTab(tabName) {
+      ["partidos", "simulador", "noticias", "equipos"].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add("hidden");
+        const btn = document.getElementById(`tabBtn-${t}`);
+        btn.className = "px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white";
+      });
+      document.getElementById(`tab-${tabName}`).classList.remove("hidden");
+      const activeBtn = document.getElementById(`tabBtn-${tabName}`);
+      activeBtn.className = "px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition bg-cyan-400 text-slate-950 cyan-glow";
+    }
+
+    function inicializarSelectoresSimulador() {
+      const selL = document.getElementById("simSelectLocal");
+      const selV = document.getElementById("simSelectVisita");
+      if (selL.options.length > 0) return;
+
+      Object.keys(ESCUDOS_PL).forEach((key, idx) => {
+        const meta = ESCUDOS_PL[key];
+        selL.innerHTML += `<option value="${key}" ${idx === 0 ? "selected" : ""}>${meta.abbr} · ${meta.nombre}</option>`;
+        selV.innerHTML += `<option value="${key}" ${idx === 14 ? "selected" : ""}>${meta.abbr} · ${meta.nombre}</option>`;
+      });
+      actualizarPreviewEscudos();
+    }
+
+    function actualizarPreviewEscudos() {
+      const locKey = document.getElementById("simSelectLocal").value;
+      const visKey = document.getElementById("simSelectVisita").value;
+      const loc = getTeamMeta(locKey);
+      const vis = getTeamMeta(visKey);
+
+      document.getElementById("simEscudoLocal").src = loc.logo;
+      document.getElementById("simNombreLocal").textContent = loc.nombre;
+      document.getElementById("simEscudoVisita").src = vis.logo;
+      document.getElementById("simNombreVisita").textContent = vis.nombre;
+    }
+
+    function obtenerMejorPickDeportivo(deportivo, locAbbr, visAbbr) {
+      const probs = deportivo.simulacion_monte_carlo.probabilidades_1X2_pct;
+      const goles = deportivo.simulacion_monte_carlo.mercados_goles_pct;
+
+      const candidatos = [
+        { label: `${locAbbr} gana (1)`, prob: probs.local_1, desc: "DOMINA EN PROYECCIÓN DEPORTIVA" },
+        { label: `${visAbbr} gana (2)`, prob: probs.visita_2, desc: "VENTAJA ESTADÍSTICA DE VISITA" },
+        { label: `Over 2.5 Goles`, prob: goles.over_2_5, desc: "ALTA PROYECCIÓN DE xG COMBINADO" },
+        { label: `Under 2.5 Goles`, prob: goles.under_2_5, desc: "PARTIDO CERRADO / NEUTRALIZACIÓN" },
+        { label: `Ambos Anotan SÍ`, prob: goles.ambos_anotan_SI, desc: "AMBOS ATAQUES CON ALTA EFICACIA" }
+      ];
+      candidatos.sort((a, b) => b.prob - a.prob);
+      return candidatos[0];
+    }
+
+    function renderCardPartidoCompacta(matchObj, index) {
+      const info = matchObj.partido_info;
+      const dep = matchObj.bloque_2_deportivo_y_extracancha;
+      const elo = dep.fuerzas_y_elo_dinamico;
+      const loc = getTeamMeta(info.local_modelo);
+      const vis = getTeamMeta(info.visitante_modelo);
+      const bestPick = obtenerMejorPickDeportivo(dep, loc.abbr, vis.abbr);
+
+      const hora = info.fecha_utc
+        ? new Date(info.fecha_utc).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        : "Simulación";
+
+      return `
+        <div class="card-dark rounded-2xl p-5 flex flex-col justify-between transition">
+          <div>
+            <!-- Encabezado con Escudos y Abreviaturas (Estilo Imagen 1) -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <img src="${loc.logo}" alt="${loc.abbr}" class="w-9 h-9 object-contain" />
+                <div>
+                  <div class="text-lg font-black text-white leading-none">${loc.abbr}</div>
+                  <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">LOCAL</div>
+                </div>
+              </div>
+
+              <div class="w-3 h-3 rounded-full bg-cyan-400/20 border border-cyan-400 cyan-glow"></div>
+
+              <div class="flex items-center gap-2.5 text-right">
+                <div>
+                  <div class="text-lg font-black text-white leading-none">${vis.abbr}</div>
+                  <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">VISITA</div>
+                </div>
+                <img src="${vis.logo}" alt="${vis.abbr}" class="w-9 h-9 object-contain" />
+              </div>
+            </div>
+
+            <!-- Hora y Proyección xG -->
+            <div class="flex items-center justify-between text-xs text-slate-400 mt-4">
+              <span>${hora}</span>
+              <span>Proy xG <strong class="text-slate-200">${elo.xg_proyectado_local}–${elo.xg_proyectado_visitante}</strong></span>
+            </div>
+
+            <!-- Caja Pick Principal -->
+            <div class="mt-3 bg-cyan-950/30 border border-cyan-500/40 rounded-xl p-3.5">
+              <div class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">PICK DEPORTIVO</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-sm font-extrabold text-white">${bestPick.label}</span>
+                <span class="text-base font-black text-white">${bestPick.prob}%</span>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="abrirModalDetalle(${index})" class="mt-4 w-full py-2.5 rounded-xl bg-[#070b14] hover:bg-cyan-400/10 border border-slate-700 hover:border-cyan-400 text-cyan-400 font-extrabold text-xs tracking-widest uppercase transition">
+            ANALIZAR ▸
+          </button>
+        </div>
+      `;
+    }
+
+    function construirHtmlDetalleCompleto(info, mercado, dep) {
+      const mc = dep.simulacion_monte_carlo;
+      const elo = dep.fuerzas_y_elo_dinamico;
+      const hist = dep.estadisticas_historicas_y_forma;
+      const extra = dep.factores_extra_cancha;
+      const tact = dep.estilos_de_juego_y_neutralizacion;
       const tempAvg = hist.promedios_goles_temporada_completa || {};
       const h2h = hist.h2h_ultimos_10 || {};
       const tabla = extra.presion_tabla_y_clasificacion || {};
 
       const cuotasHtml = mercado.probabilidad_implicita_justa_pct
-        ? `
-          <div class="grid grid-cols-3 gap-2 text-center my-3">
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <div class="text-xs text-slate-400">Local (1)</div>
-              <div class="text-lg font-bold text-amber-400">${mercado.cuotas_decimales.local_1}</div>
-              <div class="text-xs text-slate-300">Prob: ${mercado.probabilidad_implicita_justa_pct.local_1}%</div>
+        ? `<div class="grid grid-cols-3 gap-2 text-center my-3">
+            <div class="bg-[#060913] p-3 rounded-xl border border-slate-800">
+              <div class="text-[10px] text-slate-400">LOCAL (1)</div>
+              <div class="text-base font-black text-amber-400">${mercado.cuotas_decimales.local_1}</div>
+              <div class="text-[11px] text-slate-300">Imp: ${mercado.probabilidad_implicita_justa_pct.local_1}%</div>
             </div>
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <div class="text-xs text-slate-400">Empate (X)</div>
-              <div class="text-lg font-bold text-amber-400">${mercado.cuotas_decimales.empate_X}</div>
-              <div class="text-xs text-slate-300">Prob: ${mercado.probabilidad_implicita_justa_pct.empate_X}%</div>
+            <div class="bg-[#060913] p-3 rounded-xl border border-slate-800">
+              <div class="text-[10px] text-slate-400">EMPATE (X)</div>
+              <div class="text-base font-black text-amber-400">${mercado.cuotas_decimales.empate_X}</div>
+              <div class="text-[11px] text-slate-300">Imp: ${mercado.probabilidad_implicita_justa_pct.empate_X}%</div>
             </div>
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <div class="text-xs text-slate-400">Visita (2)</div>
-              <div class="text-lg font-bold text-amber-400">${mercado.cuotas_decimales.visita_2}</div>
-              <div class="text-xs text-slate-300">Prob: ${mercado.probabilidad_implicita_justa_pct.visita_2}%</div>
+            <div class="bg-[#060913] p-3 rounded-xl border border-slate-800">
+              <div class="text-[10px] text-slate-400">VISITA (2)</div>
+              <div class="text-base font-black text-amber-400">${mercado.cuotas_decimales.visita_2}</div>
+              <div class="text-[11px] text-slate-300">Imp: ${mercado.probabilidad_implicita_justa_pct.visita_2}%</div>
             </div>
           </div>
-          <p class="text-xs text-slate-400">Comisión (Vig) de la casa: <span class="text-slate-200 font-semibold">${mercado.margen_casa_vig_pct}%</span> | Línea Goles: <span class="text-slate-200 font-semibold">${mercado.linea_goles_mercado || "N/A"}</span></p>
-        `
-        : `<div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-amber-300 my-3">
-            ${mercado.estado_cuotas || "Cuotas 1X2 pendientes"} | Línea Goles: ${mercado.linea_goles_mercado || "N/A"} | Cuota Empate: ${mercado.cuotas_decimales?.empate_X || "N/A"} | Visita: ${mercado.cuotas_decimales?.visita_2 || "N/A"}
-           </div>`;
+          <div class="text-xs text-slate-400">Comisión Casa (Vig): <strong class="text-white">${mercado.margen_casa_vig_pct}%</strong> • Línea Goles: <strong class="text-white">${mercado.linea_goles_mercado || "N/A"}</strong></div>`
+        : `<div class="bg-[#060913] border border-slate-800 rounded-xl p-3 text-xs text-amber-300 my-2">
+            ${mercado.estado_cuotas || "Sin cuotas activas"} • Línea Goles: ${mercado.linea_goles_mercado || "N/A"}
+          </div>`;
 
-      const h2hCierres = (mercado.historico_cuotas_cierre_h2h || []).map(c =>
-        `<li class="flex justify-between text-xs py-1 border-b border-slate-800/60">
+      const cierresHtml = (mercado.historico_cuotas_cierre_h2h || []).map(c =>
+        `<div class="flex justify-between text-xs py-1.5 border-b border-slate-800/60">
           <span>${c.fecha}: ${c.local} vs ${c.visita} (${c.resultado_real})</span>
           <span class="text-amber-400 font-mono">${c.cierre_pinnacle_1X2}</span>
-        </li>`
-      ).join("") || `<li class="text-xs text-slate-500">Sin cierres históricos recientes en Premier League</li>`;
-
-      const h2hDuelosHtml = (h2h.ultimos_duelos || []).map(d =>
-        `<span class="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xs font-mono">
-          ${d.fecha}: ${d.local} <strong class="text-white">${d.marcador}</strong> ${d.visitante}
-        </span>`
-      ).join("") || `<span class="text-xs text-slate-500">Sin duelos directos recientes</span>`;
+        </div>`
+      ).join("") || `<div class="text-xs text-slate-500">Sin cierres históricos registrados</div>`;
 
       const marcadoresHtml = mc.marcadores_exactos_mas_probables.map(m =>
-        `<span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono">
-          <strong class="text-emerald-400">${m.marcador}</strong> (${m.probabilidad_pct}%)
+        `<span class="px-2.5 py-1 rounded-lg bg-[#060913] border border-slate-800 text-xs font-mono">
+          <strong class="text-cyan-400">${m.marcador}</strong> (${m.probabilidad_pct}%)
         </span>`
       ).join("");
 
-      const bajasLocal = (extra.bajas_y_lesiones_reportadas?.local || []).join(", ") || "Sin bajas reportadas";
-      const bajasVisita = (extra.bajas_y_lesiones_reportadas?.visitante || []).join(", ") || "Sin bajas reportadas";
-      const exJugadores = (extra.jugadores_pasado_en_ambos_equipos || []).map(j => `${j.jugador} (${j.equipo_actual}, ex ${j.ex_equipo})`).join(", ") || "Ninguno detectado";
+      const h2hDuelos = (h2h.ultimos_duelos || []).map(d =>
+        `<span class="px-2 py-1 rounded bg-[#060913] border border-slate-800 text-xs font-mono">${d.fecha}: ${d.local} <strong>${d.marcador}</strong> ${d.visitante}</span>`
+      ).join("") || `<span class="text-xs text-slate-500">Sin enfrentamientos directos recientes</span>`;
 
-      const noticiasLocal = (extra.prensa_lesiones_y_rumores_rss?.noticias_y_alertas_local || []).map(n =>
-        `<li class="text-xs text-slate-300">• [${n.fuente}] ${n.titular}</li>`
-      ).join("") || `<li class="text-xs text-slate-500">Sin alertas recientes en prensa</li>`;
-
-      const noticiasVisita = (extra.prensa_lesiones_y_rumores_rss?.noticias_y_alertas_visitante || []).map(n =>
-        `<li class="text-xs text-slate-300">• [${n.fuente}] ${n.titular}</li>`
-      ).join("") || `<li class="text-xs text-slate-500">Sin alertas recientes en prensa</li>`;
+      const bajasL = (extra.bajas_y_lesiones_reportadas?.local || []).join(", ") || "Sin bajas oficiales";
+      const bajasV = (extra.bajas_y_lesiones_reportadas?.visitante || []).join(", ") || "Sin bajas oficiales";
+      const exJug = (extra.jugadores_pasado_en_ambos_equipos || []).map(j => `${j.jugador} (${j.equipo_actual})`).join(", ") || "Ninguno detectado";
 
       return `
-        <article class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-          <!-- Cabecera Partido -->
-          <div class="bg-slate-800/60 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-2 border-b border-slate-700/60">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- BLOQUE 1: MERCADO -->
+          <div class="lg:col-span-5 bg-[#060913] border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400">1. ANÁLISIS DEL MERCADO (CUOTAS)</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">${mercado.proveedor}</span>
+            </div>
+            ${cuotasHtml}
+            <div class="pt-3 border-t border-slate-800">
+              <div class="text-[11px] font-bold uppercase text-slate-400 mb-2">Cierres Históricos Pinnacle (H2H)</div>
+              ${cierresHtml}
+            </div>
+          </div>
+
+          <!-- BLOQUE 2: DEPORTIVO Y EXTRA-CANCHA -->
+          <div class="lg:col-span-7 bg-[#060913] border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-400">2. ANÁLISIS DEPORTIVO Y EXTRA-CANCHA</span>
+              <span class="text-[11px] text-slate-400">25,000 Sims Monte Carlo</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-cyan-950/30 border border-cyan-500/30 p-3 rounded-xl">
+                <div class="text-[11px] text-cyan-300">Local (1)</div>
+                <div class="text-lg font-black text-white">${mc.probabilidades_1X2_pct.local_1}%</div>
+                <div class="text-[10px] text-slate-400">xG: ${elo.xg_proyectado_local} | Elo: ${elo.elo_local}</div>
+              </div>
+              <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+                <div class="text-[11px] text-slate-400">Empate (X)</div>
+                <div class="text-lg font-black text-white">${mc.probabilidades_1X2_pct.empate_X}%</div>
+                <div class="text-[10px] text-slate-400">Dif Elo: ${elo.diferencial_elo}</div>
+              </div>
+              <div class="bg-indigo-950/30 border border-indigo-500/30 p-3 rounded-xl">
+                <div class="text-[11px] text-indigo-300">Visita (2)</div>
+                <div class="text-lg font-black text-white">${mc.probabilidades_1X2_pct.visita_2}%</div>
+                <div class="text-[10px] text-slate-400">xG: ${elo.xg_proyectado_visitante} | Elo: ${elo.elo_visitante}</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2 text-center text-xs">
+              <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Over 2.5</span>
+                <strong class="text-cyan-400">${mc.mercados_goles_pct.over_2_5}%</strong>
+              </div>
+              <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Under 2.5</span>
+                <strong>${mc.mercados_goles_pct.under_2_5}%</strong>
+              </div>
+              <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">BTTS SÍ</span>
+                <strong class="text-cyan-400">${mc.mercados_goles_pct.ambos_anotan_SI}%</strong>
+              </div>
+              <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px]">Over 1.5</span>
+                <strong>${mc.mercados_goles_pct.over_1_5}%</strong>
+              </div>
+            </div>
+
             <div>
-              <span class="text-xs uppercase tracking-wider text-emerald-400 font-semibold">${info.estado || "Simulación"} • ${info.fecha_utc ? new Date(info.fecha_utc).toLocaleString() : "Hoy"}</span>
-              <h3 class="text-2xl font-bold text-white mt-0.5">${info.local} <span class="text-slate-500 text-lg font-normal">vs</span> ${info.visitante}</h3>
-            </div>
-            <div class="text-right text-xs text-slate-300 space-y-1">
-              <div>Récord Temporada: <span class="font-semibold text-white">${info.record_local || "-"}</span> vs <span class="font-semibold text-white">${info.record_visita || "-"}</span></div>
-              <div class="text-indigo-300 font-medium">${extra.rivalidad?.nombre_rivalidad || ""}</div>
-            </div>
-          </div>
-
-          <!-- 2 Columnas Independientes -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-800">
-            
-            <!-- COLUMNA 1: SOLO MERCADO Y CUOTAS -->
-            <div class="lg:col-span-5 p-6 bg-slate-900/40 space-y-4">
-              <div class="flex items-center justify-between">
-                <h4 class="text-sm font-bold uppercase tracking-wider text-amber-400">1. Análisis del Mercado (Cuotas)</h4>
-                <span class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">${mercado.proveedor}</span>
-              </div>
-              ${cuotasHtml}
-              <div class="pt-3 border-t border-slate-800">
-                <h5 class="text-xs font-semibold uppercase text-slate-400 mb-2">Historial Cuotas Cierre Pinnacle (H2H)</h5>
-                <ul>${h2hCierres}</ul>
-              </div>
+              <span class="text-[11px] text-slate-400 block mb-1">Marcadores Exactos Más Probables:</span>
+              <div class="flex flex-wrap gap-1.5">${marcadoresHtml}</div>
             </div>
 
-            <!-- COLUMNA 2: SOLO DEPORTIVO, TÁCTICO Y EXTRA-CANCHA -->
-            <div class="lg:col-span-7 p-6 space-y-5">
-              <div class="flex items-center justify-between">
-                <h4 class="text-sm font-bold uppercase tracking-wider text-emerald-400">2. Análisis Deportivo y Extra-Cancha</h4>
-                <span class="text-xs text-slate-400">Monte Carlo: 25,000 sims</span>
-              </div>
-
-              <!-- Probabilidades 1X2 del Modelo -->
-              <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="bg-emerald-950/30 border border-emerald-500/30 p-3 rounded-xl">
-                  <div class="text-xs text-emerald-300">Gana Local</div>
-                  <div class="text-xl font-extrabold text-white">${mc.probabilidades_1X2_pct.local_1}%</div>
-                  <div class="text-xs text-slate-400">xG: ${elo.xg_proyectado_local} | Elo: ${elo.elo_local}</div>
-                </div>
-                <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl">
-                  <div class="text-xs text-slate-400">Empate</div>
-                  <div class="text-xl font-extrabold text-white">${mc.probabilidades_1X2_pct.empate_X}%</div>
-                  <div class="text-xs text-slate-400">Dif Elo: ${elo.diferencial_elo}</div>
-                </div>
-                <div class="bg-indigo-950/30 border border-indigo-500/30 p-3 rounded-xl">
-                  <div class="text-xs text-indigo-300">Gana Visita</div>
-                  <div class="text-xl font-extrabold text-white">${mc.probabilidades_1X2_pct.visita_2}%</div>
-                  <div class="text-xs text-slate-400">xG: ${elo.xg_proyectado_visitante} | Elo: ${elo.elo_visitante}</div>
-                </div>
-              </div>
-
-              <!-- Mercados de Goles y Marcadores -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                  <span class="text-slate-400 block">Over 2.5 Goles</span>
-                  <strong class="text-sm text-emerald-400">${mc.mercados_goles_pct.over_2_5}%</strong>
-                </div>
-                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                  <span class="text-slate-400 block">Under 2.5 Goles</span>
-                  <strong class="text-sm text-slate-200">${mc.mercados_goles_pct.under_2_5}%</strong>
-                </div>
-                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                  <span class="text-slate-400 block">Ambos Anotan SÍ</span>
-                  <strong class="text-sm text-emerald-400">${mc.mercados_goles_pct.ambos_anotan_SI}%</strong>
-                </div>
-                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                  <span class="text-slate-400 block">Over 1.5 Goles</span>
-                  <strong class="text-sm text-slate-200">${mc.mercados_goles_pct.over_1_5}%</strong>
-                </div>
-              </div>
-
+            <!-- Tabla y Presión -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-900/60 p-3 rounded-xl border border-slate-800">
               <div>
-                <span class="text-xs text-slate-400 block mb-1.5">Marcadores Exactos Más Probables:</span>
-                <div class="flex flex-wrap gap-2">${marcadoresHtml}</div>
+                <span class="text-slate-400">Posición Local:</span> <strong class="text-white">#${tabla.local?.posicion_actual || "-"} (${tabla.local?.puntos || 0} pts)</strong>
+                <div class="text-cyan-300 text-[11px]">${tabla.local?.contexto_clasificacion || ""}</div>
               </div>
-
-              <!-- Presión en Tabla de Posiciones -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
-                <div>
-                  <span class="text-slate-400 block">Tabla ${info.local}:</span>
-                  <strong class="text-white">Puesto #${tabla.local?.posicion_actual || "-"} (${tabla.local?.puntos || 0} pts)</strong>
-                  <div class="text-emerald-300 mt-0.5">${tabla.local?.contexto_clasificacion || ""}</div>
-                </div>
-                <div>
-                  <span class="text-slate-400 block">Tabla ${info.visitante}:</span>
-                  <strong class="text-white">Puesto #${tabla.visitante?.posicion_actual || "-"} (${tabla.visitante?.puntos || 0} pts)</strong>
-                  <div class="text-indigo-300 mt-0.5">${tabla.visitante?.contexto_clasificacion || ""}</div>
-                </div>
+              <div>
+                <span class="text-slate-400">Posición Visita:</span> <strong class="text-white">#${tabla.visitante?.posicion_actual || "-"} (${tabla.visitante?.puntos || 0} pts)</strong>
+                <div class="text-indigo-300 text-[11px]">${tabla.visitante?.contexto_clasificacion || ""}</div>
               </div>
+            </div>
 
-              <!-- Estadísticas Reales (Temporada, Últimos 10, Local/Visita y Tiros a Puerta) -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
-                <div class="space-y-1">
-                  <div class="font-bold text-emerald-400">${info.local} (Local)</div>
-                  <div>Prom. Goles Local Temp: <span class="text-white">${tempAvg.local?.promedio_goles_anotados_local_temporada ?? "-"} favor / ${tempAvg.local?.promedio_goles_recibidos_local_temporada ?? "-"} contra</span></div>
-                  <div>Racha últ. 10: <span class="font-mono text-white">${hist.local_general_10?.racha_ultimos_10 || "-"}</span> (${hist.local_general_10?.puntos_ultimos_10 || 0} pts)</div>
-                  <div>En Casa últ. 10: <span class="text-white">${hist.local_en_casa_10?.record_ultimos_10 || "-"}</span></div>
-                  <div>Tiros a puerta casa: <span class="text-white">${hist.local_en_casa_10?.promedio_tiros_puerta_favor || 0} favor / ${hist.local_en_casa_10?.promedio_tiros_puerta_contra || 0} contra</span></div>
-                  <div>Descanso real: <span class="text-white">${hist.local_general_10?.dias_descanso_reales || "-"} días</span></div>
-                </div>
-                <div class="space-y-1">
-                  <div class="font-bold text-indigo-400">${info.visitante} (Visita)</div>
-                  <div>Prom. Goles Visita Temp: <span class="text-white">${tempAvg.visitante?.promedio_goles_anotados_visita_temporada ?? "-"} favor / ${tempAvg.visitante?.promedio_goles_recibidos_visita_temporada ?? "-"} contra</span></div>
-                  <div>Racha últ. 10: <span class="font-mono text-white">${hist.visita_general_10?.racha_ultimos_10 || "-"}</span> (${hist.visita_general_10?.puntos_ultimos_10 || 0} pts)</div>
-                  <div>De Visita últ. 10: <span class="text-white">${hist.visita_fuera_10?.record_ultimos_10 || "-"}</span></div>
-                  <div>Tiros a puerta fuera: <span class="text-white">${hist.visita_fuera_10?.promedio_tiros_puerta_favor || 0} favor / ${hist.visita_fuera_10?.promedio_tiros_puerta_contra || 0} contra</span></div>
-                  <div>Descanso real: <span class="text-white">${hist.visita_general_10?.dias_descanso_reales || "-"} días</span></div>
-                </div>
+            <!-- Estadísticas Últimos 10 y Temporada -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+              <div class="space-y-1">
+                <div class="font-bold text-cyan-400">Local · Forma y Tiros</div>
+                <div>Prom. Goles Local Temp: <strong>${tempAvg.local?.promedio_goles_anotados_local_temporada ?? "-"} / ${tempAvg.local?.promedio_goles_recibidos_local_temporada ?? "-"}</strong></div>
+                <div>Últimos 10: <span class="font-mono">${hist.local_general_10?.racha_ultimos_10 || "-"}</span> (${hist.local_general_10?.puntos_ultimos_10 || 0} pts)</div>
+                <div>En Casa (10): <strong>${hist.local_en_casa_10?.record_ultimos_10 || "-"}</strong> | SOT: <strong>${hist.local_en_casa_10?.promedio_tiros_puerta_favor || 0}</strong></div>
+                <div>Descanso real: <strong>${hist.local_general_10?.dias_descanso_reales || "-"} días</strong></div>
               </div>
-
-              <!-- Historial H2H -->
-              <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-2">
-                <div class="font-bold text-slate-200">Historial Directo H2H (${h2h.partidos_encontrados || 0} juegos): <span class="text-emerald-400">${h2h.victorias_local_actual || 0}G Local</span> • <span class="text-slate-400">${h2h.empates || 0}E</span> • <span class="text-indigo-400">${h2h.victorias_visita_actual || 0}G Visita</span></div>
-                <div class="flex flex-wrap gap-1.5">${h2hDuelosHtml}</div>
+              <div class="space-y-1">
+                <div class="font-bold text-indigo-400">Visita · Forma y Tiros</div>
+                <div>Prom. Goles Visita Temp: <strong>${tempAvg.visitante?.promedio_goles_anotados_visita_temporada ?? "-"} / ${tempAvg.visitante?.promedio_goles_recibidos_visita_temporada ?? "-"}</strong></div>
+                <div>Últimos 10: <span class="font-mono">${hist.visita_general_10?.racha_ultimos_10 || "-"}</span> (${hist.visita_general_10?.puntos_ultimos_10 || 0} pts)</div>
+                <div>De Visita (10): <strong>${hist.visita_fuera_10?.record_ultimos_10 || "-"}</strong> | SOT: <strong>${hist.visita_fuera_10?.promedio_tiros_puerta_favor || 0}</strong></div>
+                <div>Descanso real: <strong>${hist.visita_general_10?.dias_descanso_reales || "-"} días</strong></div>
               </div>
+            </div>
 
-              <!-- Estilos de Juego y Neutralización -->
-              <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-1.5">
-                <div class="font-bold text-cyan-400">Choque Táctico y Neutralización (Índice: ${tact?.indice_neutralizacion_mutua || 0})</div>
-                <div><strong>${info.local}:</strong> ${tact?.perfil_tactico_local?.estilo_detectado || "-"}</div>
-                <div><strong>${info.visitante}:</strong> ${tact?.perfil_tactico_visitante?.estilo_detectado || "-"}</div>
-                <div class="text-slate-300 italic pt-1">${tact?.lectura_choque_estilos || ""}</div>
-              </div>
+            <!-- Táctica y Extra-Cancha -->
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1">
+              <div class="font-bold text-cyan-400">Neutralización Táctica (Índice: ${tact?.indice_neutralizacion_mutua || 0})</div>
+              <div><strong>Local:</strong> ${tact?.perfil_tactico_local?.estilo_detectado || "-"}</div>
+              <div><strong>Visita:</strong> ${tact?.perfil_tactico_visitante?.estilo_detectado || "-"}</div>
+              <div class="text-slate-300 italic">${tact?.lectura_choque_estilos || ""}</div>
+            </div>
 
-              <!-- Bajas, Ley del Ex y Prensa -->
-              <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-2">
-                <div><strong class="text-rose-400">Bajas/Lesiones Local:</strong> ${bajasLocal}</div>
-                <div><strong class="text-rose-400">Bajas/Lesiones Visita:</strong> ${bajasVisita}</div>
-                <div><strong class="text-amber-300">Jugadores con pasado en ambos clubes:</strong> ${exJugadores}</div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
-                  <div>
-                    <span class="font-semibold text-slate-400 block mb-1">Noticias ${info.local}:</span>
-                    <ul class="space-y-1">${noticiasLocal}</ul>
-                  </div>
-                  <div>
-                    <span class="font-semibold text-slate-400 block mb-1">Noticias ${info.visitante}:</span>
-                    <ul class="space-y-1">${noticiasVisita}</ul>
-                  </div>
-                </div>
-              </div>
-
+            <div class="text-xs space-y-1 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+              <div><strong class="text-amber-300">Rivalidad:</strong> ${extra.rivalidad?.nombre_rivalidad || "-"}</div>
+              <div><strong class="text-rose-400">Bajas Local:</strong> ${bajasL}</div>
+              <div><strong class="text-rose-400">Bajas Visita:</strong> ${bajasV}</div>
+              <div><strong class="text-emerald-300">Ley del Ex:</strong> ${exJug}</div>
+              <div class="pt-1 flex flex-wrap gap-1.5">${h2hDuelos}</div>
             </div>
           </div>
-        </article>
+        </div>
       `;
     }
 
-    async function cargarJornada() {
-      const loader = document.getElementById("loader");
-      const cont = document.getElementById("contenedorPartidos");
-      loader.classList.remove("hidden");
-      cont.classList.add("hidden");
-
-      try {
-        const res = await fetch(`${API_BASE}/api/premier/jornada`);
-        const data = await res.json();
-        cont.innerHTML = data.partidos.map(p =>
-          renderTarjetaPartido(p.partido_info, p.bloque_1_mercado_cuotas, p.bloque_2_deportivo_y_extracancha)
-        ).join("");
-      } catch (err) {
-        cont.innerHTML = `<div class="p-4 bg-red-950/50 border border-red-500 rounded-xl text-red-200 text-sm">Error conectando con Render: ${err.message}</div>`;
-      } finally {
-        loader.classList.add("hidden");
-        cont.classList.remove("hidden");
-      }
+    function abrirModalDetalle(index) {
+      const m = jornadaCache[index];
+      if (!m) return;
+      document.getElementById("modalTitulo").textContent = `${m.partido_info.local} vs ${m.partido_info.visitante} · Auditoría Dual`;
+      document.getElementById("modalContenido").innerHTML = construirHtmlDetalleCompleto(
+        m.partido_info, m.bloque_1_mercado_cuotas, m.bloque_2_deportivo_y_extracancha
+      );
+      document.getElementById("modalDetalle").classList.remove("hidden");
     }
 
-    async function simularCruce() {
-      const local = document.getElementById("selectLocal").value;
-      const visita = document.getElementById("selectVisita").value;
-      if (!local || !visita || local === visita) {
-        alert("Selecciona dos equipos diferentes.");
+    function cerrarModal() {
+      document.getElementById("modalDetalle").classList.add("hidden");
+    }
+
+    async function ejecutarSimulacion() {
+      const locKey = document.getElementById("simSelectLocal").value;
+      const visKey = document.getElementById("simSelectVisita").value;
+      if (!locKey || !visKey || locKey === visKey) {
+        alert("Selecciona dos equipos distintos.");
         return;
       }
-      const loader = document.getElementById("loader");
-      const cont = document.getElementById("contenedorPartidos");
-      loader.classList.remove("hidden");
-      cont.classList.add("hidden");
+      const cont = document.getElementById("simResultadoContainer");
+      cont.innerHTML = `<div class="text-center py-8 text-cyan-400 text-xs font-bold">Ejecutando 25,000 simulaciones Monte Carlo para ${locKey} vs ${visKey}...</div>`;
 
       try {
-        const res = await fetch(`${API_BASE}/api/premier/simular/${encodeURIComponent(local)}/${encodeURIComponent(visita)}`);
+        const res = await fetch(`${API_BASE}/api/premier/simular/${encodeURIComponent(locKey)}/${encodeURIComponent(visKey)}`);
         const data = await res.json();
-        const info = { local, visitante: visita, estado: "Simulación Personalizada" };
-        cont.innerHTML = renderTarjetaPartido(info, data.bloque_1_mercado_cuotas, data.bloque_2_deportivo_y_extracancha);
-      } catch (err) {
-        cont.innerHTML = `<div class="p-4 bg-red-950/50 border border-red-500 rounded-xl text-red-200 text-sm">Error en simulación: ${err.message}</div>`;
-      } finally {
-        loader.classList.add("hidden");
-        cont.classList.remove("hidden");
+        const locMeta = getTeamMeta(locKey);
+        const visMeta = getTeamMeta(visKey);
+        const info = { local: locMeta.nombre, visitante: visMeta.nombre };
+        cont.innerHTML = construirHtmlDetalleCompleto(info, data.bloque_1_mercado_cuotas, data.bloque_2_deportivo_y_extracancha);
+      } catch (e) {
+        cont.innerHTML = `<div class="text-rose-400 text-xs p-4">Error simulando: ${e.message}</div>`;
       }
     }
 
-    cargarJornada();
+    async function cargarTodoPremier() {
+      const loader = document.getElementById("leagueLoader");
+      loader.classList.remove("hidden");
+
+      try {
+        const [resJornada, resLiga] = await Promise.all([
+          fetch(`${API_BASE}/api/premier/jornada`),
+          fetch(`${API_BASE}/api/premier/liga-info`)
+        ]);
+
+        const dataJornada = await resJornada.json();
+        const dataLiga = await resLiga.json();
+
+        jornadaCache = dataJornada.partidos || [];
+        ligaInfoCache = dataLiga;
+
+        // 1. Renderizar Pestaña Partidos
+        const fechasDiv = document.getElementById("fechasPills");
+        const rankDiv = document.getElementById("rankingDiaList");
+        const gridDiv = document.getElementById("partidosGrid");
+
+        fechasDiv.innerHTML = `
+          <span class="px-4 py-1.5 rounded-full bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider cyan-glow">
+            PRÓXIMA JORNADA · ${jornadaCache.length} PARTIDOS
+          </span>
+        `;
+
+        rankDiv.innerHTML = jornadaCache.map((m, i) => {
+          const loc = getTeamMeta(m.partido_info.local_modelo);
+          const vis = getTeamMeta(m.partido_info.visitante_modelo);
+          const pick = obtenerMejorPickDeportivo(m.bloque_2_deportivo_y_extracancha, loc.abbr, vis.abbr);
+          return `
+            <div onclick="abrirModalDetalle(${i})" class="py-3 flex items-center justify-between cursor-pointer hover:bg-slate-800/30 px-2 rounded-lg transition">
+              <div>
+                <div class="text-sm font-extrabold text-white">${loc.abbr} vs ${vis.abbr}</div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${pick.desc}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-sm font-extrabold text-white">${pick.label}</div>
+                <div class="text-xs font-bold text-cyan-400">${pick.prob}%</div>
+              </div>
+            </div>
+          `;
+        }).join("") || `<div class="text-xs text-slate-500 py-2">No hay partidos programados en este momento.</div>`;
+
+        gridDiv.innerHTML = jornadaCache.map((m, i) => renderCardPartidoCompacta(m, i)).join("");
+
+        // 2. Renderizar Pestaña Noticias (Estilo Imagen 3)
+        const newsDiv = document.getElementById("noticiasListContainer");
+        const allNews = dataLiga.noticias_liga || [];
+        newsDiv.innerHTML = allNews.map(n => `
+          <div class="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-cyan-400 text-xs">▼</span>
+                <span class="font-bold text-sm text-white">${n.titular}</span>
+              </div>
+              <div class="text-xs text-slate-400 mt-1">${n.fuente} · ${n.fecha}</div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="px-3 py-1 rounded-lg text-[11px] font-bold border ${n.critica ? 'bg-rose-950/50 border-rose-500/40 text-rose-300' : 'bg-slate-900 border-slate-700 text-slate-300'}">
+                ${n.tipo}
+              </span>
+            </div>
+          </div>
+        `).join("") || `<div class="text-xs text-slate-500 py-4">Sin noticias recientes disponibles.</div>`;
+
+        // 3. Renderizar Pestaña Equipos / Tabla (Estilo Imagen 4)
+        const tbody = document.getElementById("tablaEquiposBody");
+        const tabla = dataLiga.tabla_posiciones || [];
+        tbody.innerHTML = tabla.map(t => `
+          <tr class="hover:bg-slate-800/30 transition">
+            <td class="py-3 px-4 flex items-center gap-3">
+              <span class="w-5 text-slate-500 font-bold">${t.pos}</span>
+              <img src="${t.escudo}" class="w-6 h-6 object-contain" />
+              <div>
+                <span class="font-extrabold text-white">${t.abreviatura}</span>
+                <span class="text-slate-400 ml-1.5">${t.equipo_espn}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-center font-semibold text-slate-300">${t.jj}</td>
+            <td class="py-3 px-3 text-center text-slate-400">${t.g}-${t.e}-${t.p}</td>
+            <td class="py-3 px-3 text-center"><span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 font-bold text-white">${t.gf}</span></td>
+            <td class="py-3 px-3 text-center"><span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 font-bold text-white">${t.gc}</span></td>
+            <td class="py-3 px-3 text-center font-bold ${t.dif >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${t.dif > 0 ? '+' + t.dif : t.dif}</td>
+            <td class="py-3 px-3 text-center font-semibold text-slate-200">${t.gfj}</td>
+            <td class="py-3 px-3 text-center font-semibold text-slate-200">${t.gcj}</td>
+            <td class="py-3 px-3 text-center font-black text-cyan-400">${t.pts}</td>
+            <td class="py-3 px-4 text-right font-extrabold text-white">${t.pyth}%</td>
+          </tr>
+        `).join("");
+
+        loader.classList.add("hidden");
+        cambiarTab("partidos");
+      } catch (err) {
+        loader.innerHTML = `<div class="text-rose-400 text-sm">Error sincronizando datos: ${err.message}</div>`;
+      }
+    }
   </script>
 </body>
 </html>
