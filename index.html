@@ -613,7 +613,8 @@
     let pendingRenderCallback = null;
 
     function getTeamMeta(key) {
-      return ESCUDOS_PL[key] || { nombre: key, abbr: key.slice(0, 3).toUpperCase(), logo: "https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" };
+      const k = key || "Equipo";
+      return ESCUDOS_PL[k] || { nombre: k, abbr: k.slice(0, 3).toUpperCase(), logo: "https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" };
     }
 
     function parseCuotaUsuario(rawStr) {
@@ -677,7 +678,7 @@
     function autocompletarCuotasJornada() {
       const locKey = document.getElementById("simSelectLocal").value;
       const visKey = document.getElementById("simSelectVisita").value;
-      const match = jornadaCache.find(m => m.partido_info.local_modelo === locKey && m.partido_info.visitante_modelo === visKey);
+      const match = jornadaCache.find(m => m?.partido_info?.local_modelo === locKey && m?.partido_info?.visitante_modelo === visKey);
       if (!match) {
         alert("Este cruce no está en la cartelera activa hoy, pero puedes ingresar manualmente las cuotas de tu casino y ejecutar la simulación.");
         return;
@@ -956,19 +957,22 @@
       }
     }
 
-    // ================= AGRUPACIÓN POR FECHAS Y RENDER DE JORNADA =================
-    function formatearEtiquetaFecha(isoStr) {
+    // ================= AGRUPACIÓN POR FECHAS BLINDADA =================
+    function parseFechaSegura(isoStr) {
+      if (!isoStr) return new Date();
       const d = new Date(isoStr);
+      return isNaN(d.getTime()) ? new Date() : d;
+    }
+
+    function formatearEtiquetaFecha(isoStr) {
+      const d = parseFechaSegura(isoStr);
       const dias = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
       const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
-      const diaSem = dias[d.getDay()];
-      const numDia = d.getDate();
-      const mes = meses[d.getMonth()];
-      return `${diaSem} ${numDia} ${mes}`;
+      return `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]}`;
     }
 
     function obtenerClaveFecha(isoStr) {
-      const d = new Date(isoStr);
+      const d = parseFechaSegura(isoStr);
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     }
 
@@ -993,7 +997,8 @@
 
       fechasOrdenadas.forEach((fKey, idx) => {
         const lista = partidosPorFecha[fKey] || [];
-        const etiqueta = formatearEtiquetaFecha(lista[0].partido_info.fecha_utc);
+        const primerPartido = lista[0]?.partido_info || {};
+        const etiqueta = formatearEtiquetaFecha(primerPartido.fecha_utc || primerPartido.fecha);
         const prefijo = idx === 0 ? "PRÓX · " : "";
         const activo = fKey === fechaSeleccionada;
 
@@ -1030,8 +1035,8 @@
       rankDiv.innerHTML = listaDia.map(item => {
         const m = item.match;
         const globalIdx = item.globalIdx;
-        const loc = getTeamMeta(m.partido_info.local_modelo);
-        const vis = getTeamMeta(m.partido_info.visitante_modelo);
+        const loc = getTeamMeta(m.partido_info.local_modelo || m.partido_info.local);
+        const vis = getTeamMeta(m.partido_info.visitante_modelo || m.partido_info.visitante);
         const pick = obtenerMejorPickDeportivo(m.bloque_2_deportivo_y_extracancha, loc.abbr, vis.abbr);
         return `
           <div onclick="abrirModalDetalle(${globalIdx})" class="py-3 flex items-center justify-between cursor-pointer hover:bg-[#101c15] px-2 rounded-lg transition">
@@ -1051,15 +1056,16 @@
     }
 
     function renderCardPartidoCompacta(matchObj, index) {
-      const info = matchObj.partido_info;
+      const info = matchObj.partido_info || {};
       const dep = matchObj.bloque_2_deportivo_y_extracancha;
       const elo = dep.fuerzas_y_elo_dinamico;
-      const loc = getTeamMeta(info.local_modelo);
-      const vis = getTeamMeta(info.visitante_modelo);
+      const loc = getTeamMeta(info.local_modelo || info.local);
+      const vis = getTeamMeta(info.visitante_modelo || info.visitante);
       const bestPick = obtenerMejorPickDeportivo(dep, loc.abbr, vis.abbr);
 
-      const hora = info.fecha_utc
-        ? new Date(info.fecha_utc).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      const fRaw = info.fecha_utc || info.fecha;
+      const hora = fRaw
+        ? parseFechaSegura(fRaw).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "Hoy";
 
       return `
@@ -1176,8 +1182,8 @@
     function abrirModalDetalle(index) {
       const m = jornadaCache[index];
       if (!m) return;
-      const loc = getTeamMeta(m.partido_info.local_modelo);
-      const vis = getTeamMeta(m.partido_info.visitante_modelo);
+      const loc = getTeamMeta(m.partido_info.local_modelo || m.partido_info.local);
+      const vis = getTeamMeta(m.partido_info.visitante_modelo || m.partido_info.visitante);
       const cuotasMkt = m.bloque_1_mercado_cuotas?.cuotas_decimales || {};
 
       mostrarAnimacionAnalisis(loc, vis, m.bloque_2_deportivo_y_extracancha, () => {
@@ -1233,13 +1239,13 @@
       `;
 
       try {
-        // 1. Cargar primero los partidos de la jornada para mostrar la pantalla rápido
         const dataJornada = await fetchConTimeout(`${API_BASE}/api/premier/jornada`);
-        jornadaCache = dataJornada.partidos || [];
+        jornadaCache = Array.isArray(dataJornada.partidos) ? dataJornada.partidos : [];
 
         partidosPorFecha = {};
         jornadaCache.forEach((m, idx) => {
-          const fKey = obtenerClaveFecha(m.partido_info.fecha_utc);
+          if (!m || !m.partido_info) return;
+          const fKey = obtenerClaveFecha(m.partido_info.fecha_utc || m.partido_info.fecha);
           if (!partidosPorFecha[fKey]) partidosPorFecha[fKey] = [];
           partidosPorFecha[fKey].push({ match: m, globalIdx: idx });
         });
@@ -1249,11 +1255,9 @@
           seleccionarFecha(fechasOrdenadas[0]);
         }
 
-        // Mostrar ya los partidos sin hacer esperar al usuario
         loader.classList.add("hidden");
         cambiarTab("partidos");
 
-        // 2. Cargar Auditoría y Liga-Info en segundo plano (el servidor ya está despierto y con caché)
         const [dataLiga, dataAuditoria] = await Promise.all([
           fetchConTimeout(`${API_BASE}/api/premier/liga-info`, 30000).catch(() => ({ tabla_posiciones: [], noticias_liga: [] })),
           fetchConTimeout(`${API_BASE}/api/premier/auditoria`, 30000).catch(() => ({ partidos: [] }))
