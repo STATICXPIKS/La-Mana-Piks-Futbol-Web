@@ -293,7 +293,7 @@
 
         <div class="card-dark rounded-2xl p-5">
           <div class="text-xs font-extrabold uppercase tracking-widest text-neon mb-4">
-            RANKING DEL DÍA · MEJORES PICKS (ANÁLISIS DEPORTIVO PURO)
+            RANKING DEL DÍA · MEJORES PICKS MULTI-MERCADO (1X2 · GOLES · BTTS · COBERTURA)
           </div>
           <div id="rankingDiaList" class="divide-y divide-[#16241d]"></div>
         </div>
@@ -956,38 +956,92 @@
       }
     }
 
-    // ================= AGRUPACIÓN POR FECHAS REALES =================
+    // ================= PARSEO EXACTO DE FECHAS EN HORA DE MÉXICO =================
     function parseFechaSegura(isoStr) {
       if (!isoStr) return new Date();
-      const d = new Date(isoStr);
-      return isNaN(d.getTime()) ? new Date() : d;
-    }
+      let clean = String(isoStr).trim();
+      // Normalizar formatos sin segundos como "2026-11-27T20:00Z" a ISO completo
+      if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}Z$/.test(clean)) {
+        clean = clean.replace("Z", ":00Z");
+      }
+      const d = new Date(clean);
+      if (!isNaN(d.getTime())) return d;
 
-    function formatearEtiquetaFecha(isoStr) {
-      const d = parseFechaSegura(isoStr);
-      const dias = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
-      const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
-      return `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]}`;
+      // Respaldo extrayendo YYYY-MM-DD directo del texto
+      const match = clean.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (match) {
+        return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12, 0, 0);
+      }
+      return new Date();
     }
 
     function obtenerClaveFecha(isoStr) {
       const d = parseFechaSegura(isoStr);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      // Convertir a fecha local de Ciudad de México (America/Mexico_City)
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Mexico_City",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(d);
+      const y = parts.find(p => p.type === "year").value;
+      const m = parts.find(p => p.type === "month").value;
+      const day = parts.find(p => p.type === "day").value;
+      return `${y}-${m}-${day}`;
     }
 
+    function formatearEtiquetaDesdeClave(fKey) {
+      const [y, m, d] = fKey.split("-").map(Number);
+      const localDate = new Date(y, m - 1, d, 12, 0, 0);
+      const dias = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
+      const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+      return `${dias[localDate.getDay()]} ${d} ${meses[m - 1]}`;
+    }
+
+    function formatearEtiquetaFecha(isoStr) {
+      return formatearEtiquetaDesdeClave(obtenerClaveFecha(isoStr));
+    }
+
+    // ================= SELECCIÓN INTELIGENTE MULTI-MERCADO (ML, GOLES, BTTS, 1X/X2) =================
     function obtenerMejorPickDeportivo(deportivo, locAbbr, visAbbr) {
       const probs = deportivo.simulacion_monte_carlo.probabilidades_1X2_pct;
       const goles = deportivo.simulacion_monte_carlo.mercados_goles_pct;
-      const candidatos = [
-        { label: `${locAbbr} o Empate (1X)`, prob: Number((probs.local_1 + probs.empate_X).toFixed(1)), desc: "COBERTURA DE MAYOR PROBABILIDAD" },
-        { label: `${visAbbr} o Empate (X2)`, prob: Number((probs.visita_2 + probs.empate_X).toFixed(1)), desc: "COBERTURA VISITANTE SÓLIDA" },
-        { label: `${locAbbr} gana (1)`, prob: probs.local_1, desc: "DOMINA EN PROYECCIÓN DEPORTIVA" },
-        { label: `${visAbbr} gana (2)`, prob: probs.visita_2, desc: "VENTAJA ESTADÍSTICA DE VISITA" },
-        { label: `Over 2.5 Goles`, prob: goles.over_2_5, desc: "ALTA PROYECCIÓN DE xG COMBINADO" },
-        { label: `Under 2.5 Goles`, prob: goles.under_2_5, desc: "PARTIDO CERRADO / NEUTRALIZACIÓN" }
-      ];
-      candidatos.sort((a, b) => b.prob - a.prob);
-      return candidatos[0];
+
+      const p1 = probs.local_1;
+      const p2 = probs.visita_2;
+      const pX = probs.empate_X;
+      const p1X = Number((p1 + pX).toFixed(1));
+      const pX2 = Number((p2 + pX).toFixed(1));
+      const pO25 = goles.over_2_5;
+      const pU25 = goles.under_2_5;
+      const pBttsY = goles.ambos_anotan_SI;
+      const pBttsN = goles.ambos_anotan_NO;
+
+      // 1. Si hay favorito directo claro en Moneyline (>= 53%), priorizar ML directo
+      if (p1 >= 53.0 && p1 >= p2) {
+        return { label: `${locAbbr} gana (ML)`, prob: p1, desc: "VICTORIA DIRECTA · FAVORITO SÓLIDO" };
+      }
+      if (p2 >= 53.0 && p2 > p1) {
+        return { label: `${visAbbr} gana (ML)`, prob: p2, desc: "VICTORIA DIRECTA · VISITA DOMINANTE" };
+      }
+
+      // 2. Evaluar mercados de Goles (Over/Under 2.5) y Ambos Anotan (BTTS) si superan umbral fuerte (>= 58%)
+      const especiales = [
+        { label: `Under 2.5 Goles`, prob: pU25, desc: "PARTIDO CERRADO · BAJA PROYECCIÓN DE GOLES" },
+        { label: `Over 2.5 Goles`, prob: pO25, desc: "ALTA PROYECCIÓN DE GOLES (xG COMBINADO)" },
+        { label: `Ambos Anotan · SÍ`, prob: pBttsY, desc: "ATAQUES ACTIVOS EN AMBAS ÁREAS" },
+        { label: `Ambos Anotan · NO`, prob: pBttsN, desc: "PORTERÍA IMBATIDA PROYECTADA" }
+      ].sort((a, b) => b.prob - a.prob);
+
+      if (especiales[0].prob >= 58.0) {
+        return especiales[0];
+      }
+
+      // 3. Si es un duelo parejo sin dominio directo ni tendencia extrema de goles, usar Doble Oportunidad
+      if (p1X >= pX2) {
+        return { label: `${locAbbr} o Empate (1X)`, prob: p1X, desc: "DUELO PAREJO · COBERTURA LOCAL" };
+      }
+      return { label: `${visAbbr} o Empate (X2)`, prob: pX2, desc: "DUELO PAREJO · COBERTURA VISITA" };
     }
 
     function renderizarPillsFechas() {
@@ -996,8 +1050,7 @@
 
       fechasOrdenadas.forEach((fKey, idx) => {
         const lista = partidosPorFecha[fKey] || [];
-        const primerPartido = lista[0]?.partido_info || {};
-        const etiqueta = formatearEtiquetaFecha(primerPartido.fecha_utc || primerPartido.fecha);
+        const etiqueta = formatearEtiquetaDesdeClave(fKey);
         const prefijo = idx === 0 ? "PRÓX · " : "";
         const activo = fKey === fechaSeleccionada;
 
@@ -1056,13 +1109,15 @@
       const info = matchObj.partido_info || {};
       const dep = matchObj.bloque_2_deportivo_y_extracancha;
       const elo = dep.fuerzas_y_elo_dinamico;
+      const probs = dep.simulacion_monte_carlo.probabilidades_1X2_pct;
+      const goles = dep.simulacion_monte_carlo.mercados_goles_pct;
       const loc = getTeamMeta(info.local_modelo || info.local);
       const vis = getTeamMeta(info.visitante_modelo || info.visitante);
       const bestPick = obtenerMejorPickDeportivo(dep, loc.abbr, vis.abbr);
 
       const fRaw = info.fecha_utc || info.fecha;
       const hora = fRaw
-        ? parseFechaSegura(fRaw).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        ? parseFechaSegura(fRaw).toLocaleTimeString("es-MX", { timeZone: "America/Mexico_City", hour: "2-digit", minute: "2-digit" })
         : "Hoy";
 
       return `
@@ -1073,7 +1128,7 @@
                 <img src="${loc.logo}" alt="${loc.abbr}" class="w-9 h-9 object-contain" />
                 <div>
                   <div class="text-lg font-black text-white leading-none">${loc.abbr}</div>
-                  <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">LOCAL</div>
+                  <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">LOCAL · ${probs.local_1}%</div>
                 </div>
               </div>
 
@@ -1082,19 +1137,25 @@
               <div class="flex items-center gap-2.5 text-right">
                 <div>
                   <div class="text-lg font-black text-white leading-none">${vis.abbr}</div>
-                  <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">VISITA</div>
+                  <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">VISITA · ${probs.visita_2}%</div>
                 </div>
                 <img src="${vis.logo}" alt="${vis.abbr}" class="w-9 h-9 object-contain" />
               </div>
             </div>
 
             <div class="flex items-center justify-between text-xs text-slate-400 mt-4">
-              <span>${hora}</span>
+              <span>${hora} CDMX</span>
               <span>Proy xG <strong class="text-slate-200">${elo.xg_proyectado_local}–${elo.xg_proyectado_visitante}</strong></span>
             </div>
 
+            <!-- Mini resumen de mercados (O2.5 y BTTS) -->
+            <div class="grid grid-cols-2 gap-2 mt-2.5 text-[10px] text-slate-400 bg-[#050907] border border-[#16241d] rounded-lg px-2.5 py-1.5">
+              <div>Over 2.5: <strong class="text-slate-200">${goles.over_2_5}%</strong></div>
+              <div class="text-right">Ambos Anotan: <strong class="text-slate-200">${goles.ambos_anotan_SI}%</strong></div>
+            </div>
+
             <div class="mt-3 bg-[#091a12] border border-[#00FF7F]/40 rounded-xl p-3.5">
-              <div class="text-[10px] font-extrabold uppercase tracking-wider text-neon">PICK</div>
+              <div class="text-[10px] font-extrabold uppercase tracking-wider text-neon">PICK PRINCIPAL</div>
               <div class="flex items-center justify-between mt-1">
                 <span class="text-sm font-extrabold text-white">${bestPick.label}</span>
                 <span class="text-base font-black text-neon">${bestPick.prob}%</span>
