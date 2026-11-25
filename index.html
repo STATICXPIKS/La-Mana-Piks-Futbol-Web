@@ -960,14 +960,12 @@
     function parseFechaSegura(isoStr) {
       if (!isoStr) return new Date();
       let clean = String(isoStr).trim();
-      // Normalizar formatos sin segundos como "2026-11-27T20:00Z" a ISO completo
       if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}Z$/.test(clean)) {
         clean = clean.replace("Z", ":00Z");
       }
       const d = new Date(clean);
       if (!isNaN(d.getTime())) return d;
 
-      // Respaldo extrayendo YYYY-MM-DD directo del texto
       const match = clean.match(/^(\d{4})-(\d{2})-(\d{2})/);
       if (match) {
         return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12, 0, 0);
@@ -977,7 +975,6 @@
 
     function obtenerClaveFecha(isoStr) {
       const d = parseFechaSegura(isoStr);
-      // Convertir a fecha local de Ciudad de México (America/Mexico_City)
       const parts = new Intl.DateTimeFormat("en-CA", {
         timeZone: "America/Mexico_City",
         year: "numeric",
@@ -1002,7 +999,7 @@
       return formatearEtiquetaDesdeClave(obtenerClaveFecha(isoStr));
     }
 
-    // ================= SELECCIÓN INTELIGENTE MULTI-MERCADO (ML, GOLES, BTTS, 1X/X2) =================
+    // ================= SELECCIÓN INTELIGENTE MULTI-MERCADO (IDÉNTICA AL BACKEND) =================
     function obtenerMejorPickDeportivo(deportivo, locAbbr, visAbbr) {
       const probs = deportivo.simulacion_monte_carlo.probabilidades_1X2_pct;
       const goles = deportivo.simulacion_monte_carlo.mercados_goles_pct;
@@ -1017,27 +1014,27 @@
       const pBttsY = goles.ambos_anotan_SI;
       const pBttsN = goles.ambos_anotan_NO;
 
-      // 1. Si hay favorito directo claro en Moneyline (>= 53%), priorizar ML directo
-      if (p1 >= 53.0 && p1 >= p2) {
+      // 1. ML directo si el favorito supera 49.5% con ventaja >= 12% sobre el rival
+      if (p1 >= 49.5 && (p1 - p2) >= 12.0) {
         return { label: `${locAbbr} gana (ML)`, prob: p1, desc: "VICTORIA DIRECTA · FAVORITO SÓLIDO" };
       }
-      if (p2 >= 53.0 && p2 > p1) {
+      if (p2 >= 49.5 && (p2 - p1) >= 12.0) {
         return { label: `${visAbbr} gana (ML)`, prob: p2, desc: "VICTORIA DIRECTA · VISITA DOMINANTE" };
       }
 
-      // 2. Evaluar mercados de Goles (Over/Under 2.5) y Ambos Anotan (BTTS) si superan umbral fuerte (>= 58%)
+      // 2. Mercados de Goles (Over/Under 2.5) y Ambos Anotan (BTTS) si superan 53.5%
       const especiales = [
-        { label: `Under 2.5 Goles`, prob: pU25, desc: "PARTIDO CERRADO · BAJA PROYECCIÓN DE GOLES" },
         { label: `Over 2.5 Goles`, prob: pO25, desc: "ALTA PROYECCIÓN DE GOLES (xG COMBINADO)" },
         { label: `Ambos Anotan · SÍ`, prob: pBttsY, desc: "ATAQUES ACTIVOS EN AMBAS ÁREAS" },
+        { label: `Under 2.5 Goles`, prob: pU25, desc: "PARTIDO CERRADO · BAJA PROYECCIÓN DE GOLES" },
         { label: `Ambos Anotan · NO`, prob: pBttsN, desc: "PORTERÍA IMBATIDA PROYECTADA" }
       ].sort((a, b) => b.prob - a.prob);
 
-      if (especiales[0].prob >= 58.0) {
+      if (especiales[0].prob >= 53.5) {
         return especiales[0];
       }
 
-      // 3. Si es un duelo parejo sin dominio directo ni tendencia extrema de goles, usar Doble Oportunidad
+      // 3. Doble Oportunidad en duelos cerrados sin dominio claro
       if (p1X >= pX2) {
         return { label: `${locAbbr} o Empate (1X)`, prob: p1X, desc: "DUELO PAREJO · COBERTURA LOCAL" };
       }
@@ -1148,7 +1145,6 @@
               <span>Proy xG <strong class="text-slate-200">${elo.xg_proyectado_local}–${elo.xg_proyectado_visitante}</strong></span>
             </div>
 
-            <!-- Mini resumen de mercados (O2.5 y BTTS) -->
             <div class="grid grid-cols-2 gap-2 mt-2.5 text-[10px] text-slate-400 bg-[#050907] border border-[#16241d] rounded-lg px-2.5 py-1.5">
               <div>Over 2.5: <strong class="text-slate-200">${goles.over_2_5}%</strong></div>
               <div class="text-right">Ambos Anotan: <strong class="text-slate-200">${goles.ambos_anotan_SI}%</strong></div>
