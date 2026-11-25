@@ -42,6 +42,17 @@
       40%, 80% { transform: translateX(8px); }
     }
     .animate-shake { animation: shake 0.35s ease-in-out; }
+
+    @keyframes ballFlight {
+      0%   { left: 16%; top: 52%; }
+      25%  { left: 38%; top: 28%; }
+      50%  { left: 55%; top: 68%; }
+      75%  { left: 76%; top: 34%; }
+      100% { left: 84%; top: 50%; }
+    }
+    .soccer-ball-anim {
+      animation: ballFlight 2.6s ease-in-out infinite alternate;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen overflow-hidden" id="appBody">
@@ -56,7 +67,6 @@
         INGRESA CÓDIGO DE ACCESO
       </h2>
 
-      <!-- 4 Círculos Indicadores Cian -->
       <div id="pinDotsContainer" class="flex items-center justify-center gap-4 mt-5">
         <span id="dot-0" class="w-3.5 h-3.5 rounded-full border-2 border-cyan-400 transition-all duration-150"></span>
         <span id="dot-1" class="w-3.5 h-3.5 rounded-full border-2 border-cyan-400 transition-all duration-150"></span>
@@ -69,7 +79,6 @@
       </p>
     </div>
 
-    <!-- Teclado Numérico Circular -->
     <div class="grid grid-cols-3 gap-4 sm:gap-5">
       <button type="button" onclick="presionarDigito('1')" class="pin-btn">1</button>
       <button type="button" onclick="presionarDigito('2')" class="pin-btn">2</button>
@@ -117,7 +126,7 @@
           MODELOS CUANTITATIVOS <span class="text-emerald-500">IA</span>
         </h1>
         <p class="text-slate-500 text-sm sm:text-base mt-2">
-          Simulaciones Monte Carlo (25,000 iteraciones), Dixon-Coles, Elo Dinámico, xG y auditoría independiente de mercado vs. cancha.
+          Simulaciones Monte Carlo (25,000 iteraciones), Dixon-Coles, Elo Dinámico, xG y auditoría de apuestas con valor (+EV).
         </p>
       </div>
 
@@ -277,7 +286,7 @@
 
       <!-- PESTAÑA 2: SIMULADOR -->
       <div id="tab-simulador" class="hidden space-y-6">
-        <div class="card-dark rounded-2xl p-5">
+        <div class="card-dark rounded-2xl p-5 space-y-5">
           <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
             <div class="md:col-span-5">
               <label class="block text-[11px] font-extrabold uppercase tracking-wider text-cyan-400 mb-1.5">LOCAL 🏠</label>
@@ -290,24 +299,90 @@
             </div>
           </div>
 
-          <div class="mt-5 bg-[#03050a] border border-slate-800/90 rounded-2xl py-7 px-4 flex flex-col sm:flex-row items-center justify-around gap-6">
+          <div class="bg-[#03050a] border border-slate-800/90 rounded-2xl py-6 px-4 flex flex-col sm:flex-row items-center justify-around gap-6">
             <div class="flex flex-col items-center text-center">
               <img id="simEscudoLocal" src="" alt="Local" class="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.35)]" />
-              <span id="simNombreLocal" class="mt-3 font-extrabold text-sm sm:text-base text-white tracking-wide">-</span>
+              <span id="simNombreLocal" class="mt-2.5 font-extrabold text-sm sm:text-base text-white tracking-wide">-</span>
             </div>
 
-            <div class="flex flex-col items-center gap-3">
-              <span class="text-2xl font-black italic text-emerald-400 tracking-widest">VS</span>
-              <button onclick="ejecutarSimulacion()" class="px-6 py-2.5 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs uppercase tracking-wider cyan-glow transition">
-                SIMULAR ENCUENTRO ▶
-              </button>
-            </div>
+            <span class="text-2xl font-black italic text-emerald-400 tracking-widest">VS</span>
 
             <div class="flex flex-col items-center text-center">
               <img id="simEscudoVisita" src="" alt="Visita" class="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.35)]" />
-              <span id="simNombreVisita" class="mt-3 font-extrabold text-sm sm:text-base text-white tracking-wide">-</span>
+              <span id="simNombreVisita" class="mt-2.5 font-extrabold text-sm sm:text-base text-white tracking-wide">-</span>
             </div>
           </div>
+
+          <button type="button" onclick="autocompletarCuotasJornada()" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg transition">
+            ⚡ CARGAR CUOTAS DE MERCADO SI EL PARTIDO ESTÁ EN CARTELERA
+          </button>
+
+          <div class="bg-[#060913] border border-slate-800 rounded-2xl p-5 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-400">
+                🎯 CONFIGURA LAS CUOTAS REALES DE TU CASA DE APUESTAS (OPCIONAL):
+              </div>
+              <span class="text-[11px] text-slate-400">Formato Decimal (ej. 1.85) o Americano (ej. -118, +145)</span>
+            </div>
+
+            <div>
+              <div class="text-[11px] font-bold uppercase text-slate-400 mb-2">1. RESULTADO FINAL (1X2)</div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cuota Local (1)</label>
+                  <input id="odd_1" type="text" placeholder="ej. 1.95" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cuota Empate (X)</label>
+                  <input id="odd_X" type="text" placeholder="ej. 3.50" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cuota Visita (2)</label>
+                  <input id="odd_2" type="text" placeholder="ej. 3.80" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800/80">
+              <div class="text-[11px] font-bold uppercase text-slate-400 mb-2">2. DOBLE OPORTUNIDAD (APUESTA DE COBERTURA)</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cuota Local o Empate (1X)</label>
+                  <input id="odd_1X" type="text" placeholder="ej. 1.28" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cuota Visita o Empate (X2)</label>
+                  <input id="odd_X2" type="text" placeholder="ej. 1.80" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800/80">
+              <div class="text-[11px] font-bold uppercase text-slate-400 mb-2">3. TOTAL DE GOLES (2.5) Y AMBOS ANOTAN (BTTS)</div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cuota Over 2.5</label>
+                  <input id="odd_O25" type="text" placeholder="ej. 1.85" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cuota Under 2.5</label>
+                  <input id="odd_U25" type="text" placeholder="ej. 1.95" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Ambos Anotan SÍ</label>
+                  <input id="odd_BTTS_Y" type="text" placeholder="ej. 1.75" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Ambos Anotan NO</label>
+                  <input id="odd_BTTS_N" type="text" placeholder="ej. 2.00" class="w-full bg-[#0b1120] border border-slate-700 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="iniciarAnalisisSimulador()" class="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg transition">
+            EJECUTAR SIMULACIÓN CON MONTE CARLO 🚀
+          </button>
         </div>
 
         <div id="simResultadoContainer"></div>
@@ -353,12 +428,48 @@
     </div>
   </div>
 
-  <!-- MODAL DETALLE -->
-  <div id="modalDetalle" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-[#090e1a] border border-cyan-500/40 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
+  <!-- ==================== MODAL ANIMACIÓN "ANALIZANDO EN TIEMPO REAL" ==================== -->
+  <div id="modalAnimacion" class="hidden fixed inset-0 z-[70] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#070b14] border border-cyan-500/40 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-extrabold uppercase tracking-[0.22em] text-cyan-400">ANALIZANDO EN TIEMPO REAL</span>
+        <span class="flex items-center gap-1.5 text-[11px] font-bold text-rose-400">
+          <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> LIVE
+        </span>
+      </div>
+
+      <div class="relative h-48 sm:h-56 rounded-2xl border-2 border-cyan-500/60 bg-[#040914] overflow-hidden cyan-glow">
+        <div class="absolute inset-y-0 left-1/2 w-0.5 bg-cyan-500/40"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border border-cyan-500/40"></div>
+        <div class="absolute top-1/2 left-0 -translate-y-1/2 w-16 h-32 border-y border-r border-cyan-500/40"></div>
+        <div class="absolute top-1/2 right-0 -translate-y-1/2 w-16 h-32 border-y border-l border-cyan-500/40"></div>
+
+        <div id="animAbbrLocal" class="absolute top-3 left-4 text-sm font-black tracking-widest text-white">LOC</div>
+        <div id="animAbbrVisita" class="absolute top-3 right-4 text-sm font-black tracking-widest text-white">VIS</div>
+
+        <div class="soccer-ball-anim absolute -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-cyan-400 border-2 border-white shadow-[0_0_16px_#22d3ee]"></div>
+      </div>
+
+      <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div id="animProgressBar" class="h-full bg-cyan-400 transition-all duration-300" style="width: 15%"></div>
+      </div>
+
+      <div id="animLogsList" class="space-y-1.5 font-mono text-xs text-slate-300 min-h-[135px]"></div>
+
+      <div class="text-center pt-1">
+        <button onclick="saltarAnimacion()" class="px-6 py-2 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] font-extrabold uppercase tracking-widest text-slate-300 transition">
+          SALTAR ▸
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DETALLE PARTIDO DE JORNADA ==================== -->
+  <div id="modalDetalle" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-[#090e1a] border border-cyan-500/40 rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
         <div id="modalTitulo" class="text-lg font-black text-white">Análisis Detallado</div>
-        <button onclick="cerrarModal()" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">✕ CERRAR</button>
+        <button onclick="cerrarModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">✕ CERRAR</button>
       </div>
       <div id="modalContenido"></div>
     </div>
@@ -367,8 +478,8 @@
   <script>
     const API_BASE = "https://la-mana-piks-futbol.onrender.com";
 
-    // ================= TECLADO PIN (7766) SIN PERSISTENCIA =================
-    const PIN_CORRECTO = "7766"; // <-- Cambia aquí el PIN cuando quieras
+    // ================= TECLADO PIN (7766) =================
+    const PIN_CORRECTO = "7766";
     let pinActual = "";
 
     function actualizarCirculosPin() {
@@ -424,14 +535,13 @@
       document.getElementById("appBody").classList.add("overflow-hidden");
     }
 
-    // Permitir también teclear los números con el teclado físico
     document.addEventListener("keydown", (e) => {
       if (document.getElementById("lockScreen").classList.contains("hidden")) return;
       if (e.key >= "0" && e.key <= "9") presionarDigito(e.key);
       if (e.key === "Backspace") borrarDigito();
     });
 
-    // ================= DICCIONARIO DE ESCUDOS Y LÓGICA APP =================
+    // ================= ESCUDOS Y DATOS =================
     const ESCUDOS_PL = {
       "Arsenal": { nombre: "Arsenal", abbr: "ARS", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/359.png" },
       "Aston Villa": { nombre: "Aston Villa", abbr: "AVL", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/362.png" },
@@ -456,10 +566,21 @@
     };
 
     let jornadaCache = [];
-    let ligaInfoCache = { tabla_posiciones: [], noticias_liga: [] };
+    let animTimeout = null;
+    let pendingRenderCallback = null;
 
     function getTeamMeta(key) {
       return ESCUDOS_PL[key] || { nombre: key, abbr: key.slice(0, 3).toUpperCase(), logo: "https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" };
+    }
+
+    function parseCuotaUsuario(rawStr) {
+      if (!rawStr) return 0;
+      const val = parseFloat(String(rawStr).replace(",", ".").trim());
+      if (isNaN(val) || val === 0) return 0;
+      if (val >= 1.01 && val <= 60) return val;
+      if (val >= 100) return (val / 100.0) + 1.0;
+      if (val <= -100) return (100.0 / Math.abs(val)) + 1.0;
+      return 0;
     }
 
     function abrirLiga(liga) {
@@ -492,8 +613,8 @@
 
       Object.keys(ESCUDOS_PL).forEach((key, idx) => {
         const meta = ESCUDOS_PL[key];
-        selL.innerHTML += `<option value="${key}" ${idx === 0 ? "selected" : ""}>${meta.abbr} · ${meta.nombre}</option>`;
-        selV.innerHTML += `<option value="${key}" ${idx === 14 ? "selected" : ""}>${meta.abbr} · ${meta.nombre}</option>`;
+        selL.innerHTML += `<option value="${key}" ${idx === 17 ? "selected" : ""}>${meta.abbr} · ${meta.nombre}</option>`;
+        selV.innerHTML += `<option value="${key}" ${idx === 5 ? "selected" : ""}>${meta.abbr} · ${meta.nombre}</option>`;
       });
       actualizarPreviewEscudos();
     }
@@ -510,16 +631,302 @@
       document.getElementById("simNombreVisita").textContent = vis.nombre;
     }
 
+    function autocompletarCuotasJornada() {
+      const locKey = document.getElementById("simSelectLocal").value;
+      const visKey = document.getElementById("simSelectVisita").value;
+      const match = jornadaCache.find(m => m.partido_info.local_modelo === locKey && m.partido_info.visitante_modelo === visKey);
+      if (!match) {
+        alert("Este cruce no está en la cartelera activa hoy, pero puedes ingresar manualmente las cuotas de tu casino y ejecutar la simulación.");
+        return;
+      }
+      const c = match.bloque_1_mercado_cuotas?.cuotas_decimales || {};
+      if (c.local_1) document.getElementById("odd_1").value = c.local_1;
+      if (c.empate_X) document.getElementById("odd_X").value = c.empate_X;
+      if (c.visita_2) document.getElementById("odd_2").value = c.visita_2;
+      alert("Cuotas disponibles cargadas desde el mercado.");
+    }
+
+    // ================= EVALUACIÓN DE MERCADOS CON TUS REGLAS EXACTAS =================
+    function evaluarTodosLosMercados(locMeta, visMeta, dep, userOdds) {
+      const p1x2 = dep.simulacion_monte_carlo.probabilidades_1X2_pct;
+      const pgol = dep.simulacion_monte_carlo.mercados_goles_pct;
+
+      const prob1 = p1x2.local_1;
+      const probX = p1x2.empate_X;
+      const prob2 = p1x2.visita_2;
+      const prob1X = Number((prob1 + probX).toFixed(2));
+      const probX2 = Number((prob2 + probX).toFixed(2));
+
+      const listaMercados = [
+        { id: "1", nombre: `${locMeta.nombre} gana (1)`, prob: prob1, cuotaUser: userOdds.odd_1 || 0 },
+        { id: "X", nombre: `Empate (X)`, prob: probX, cuotaUser: userOdds.odd_X || 0 },
+        { id: "2", nombre: `${visMeta.nombre} gana (2)`, prob: prob2, cuotaUser: userOdds.odd_2 || 0 },
+        { id: "1X", nombre: `Doble Oportunidad ${locMeta.abbr} o Empate (1X)`, prob: prob1X, cuotaUser: userOdds.odd_1X || 0 },
+        { id: "X2", nombre: `Doble Oportunidad ${visMeta.abbr} o Empate (X2)`, prob: probX2, cuotaUser: userOdds.odd_X2 || 0 },
+        { id: "O25", nombre: `Más de 2.5 Goles (Over 2.5)`, prob: pgol.over_2_5, cuotaUser: userOdds.odd_O25 || 0 },
+        { id: "U25", nombre: `Menos de 2.5 Goles (Under 2.5)`, prob: pgol.under_2_5, cuotaUser: userOdds.odd_U25 || 0 },
+        { id: "BTTS_Y", nombre: `Ambos Equipos Anotan · SÍ`, prob: pgol.ambos_anotan_SI, cuotaUser: userOdds.odd_BTTS_Y || 0 },
+        { id: "BTTS_N", nombre: `Ambos Equipos Anotan · NO`, prob: pgol.ambos_anotan_NO, cuotaUser: userOdds.odd_BTTS_N || 0 }
+      ];
+
+      listaMercados.forEach(m => {
+        m.cuotaJusta = m.prob > 0 ? (100.0 / m.prob).toFixed(2) : "-";
+        if (m.cuotaUser > 1.0) {
+          m.evPct = Number((((m.prob / 100.0) * m.cuotaUser - 1.0) * 100.0).toFixed(1));
+          // Reglas solicitadas:
+          // ELITE BET: EV >= +4.0% y Probabilidad >= 62.0%
+          // VALUE BET: EV >= +2.0% y Probabilidad >= 50.0%
+          // NO BET / PASAR: EV < +2.0% o Probabilidad < 50.0%
+          if (m.evPct >= 4.0 && m.prob >= 62.0) {
+            m.badge = { texto: `ELITE BET 💎 (+${m.evPct}% EV)`, clase: "bg-emerald-500 text-slate-950 font-black" };
+          } else if (m.evPct >= 2.0 && m.prob >= 50.0) {
+            m.badge = { texto: `VALUE BET ✅ (+${m.evPct}% EV)`, clase: "bg-cyan-400 text-slate-950 font-black" };
+          } else {
+            m.badge = { texto: `NO BET / PASAR ⛔ (${m.evPct > 0 ? '+' + m.evPct : m.evPct}% EV)`, clase: "bg-slate-800 text-slate-400 font-bold" };
+          }
+        } else {
+          m.evPct = null;
+          m.badge = null;
+        }
+      });
+
+      const masSegura = [...listaMercados].sort((a, b) => b.prob - a.prob)[0];
+      const conCuotaValida = listaMercados.filter(m => m.evPct !== null && m.prob >= 50.0).sort((a, b) => b.evPct - a.evPct);
+      const mejorValor = conCuotaValida.length > 0 ? conCuotaValida[0] : null;
+
+      return { listaMercados, masSegura, mejorValor };
+    }
+
+    function renderPanelResultadosEstiloPro(info, mercado, dep, userOdds = {}) {
+      const locMeta = getTeamMeta(info.local_modelo || info.local);
+      const visMeta = getTeamMeta(info.visitante_modelo || info.visitante);
+      const elo = dep.fuerzas_y_elo_dinamico;
+      const extra = dep.factores_extra_cancha;
+      const tact = dep.estilos_de_juego_y_neutralizacion;
+      const tabla = extra.presion_tabla_y_clasificacion || {};
+      const mc = dep.simulacion_monte_carlo;
+
+      const evalData = evaluarTodosLosMercados(locMeta, visMeta, dep, userOdds);
+
+      const barrasHtml = evalData.listaMercados.map(m => {
+        const barColor = m.prob >= 62 ? "bg-cyan-400 cyan-glow" : (m.prob >= 50 ? "bg-sky-500" : "bg-indigo-500/80");
+        const badgeRight = m.badge
+          ? `<span class="px-2.5 py-1 rounded-full text-[10px] tracking-wider uppercase ${m.badge.clase}">${m.badge.texto}</span>`
+          : `<span class="px-2.5 py-1 rounded-lg bg-[#0b1120] border border-slate-800 text-[11px] font-mono text-slate-400">justa ${m.cuotaJusta}</span>`;
+
+        return `
+          <div class="py-2.5 border-b border-slate-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="sm:w-5/12">
+              <div class="text-xs font-extrabold text-white">${m.nombre}</div>
+              <div class="text-[10px] text-slate-400">Cuota justa: <strong class="text-slate-300">${m.cuotaJusta}</strong> ${m.cuotaUser > 1 ? `• Tu casino: <strong class="text-amber-400">@${m.cuotaUser.toFixed(2)}</strong>` : ""}</div>
+            </div>
+            <div class="sm:w-4/12 flex items-center gap-3">
+              <div class="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full ${barColor} rounded-full" style="width: ${Math.min(m.prob, 100)}%"></div>
+              </div>
+              <span class="w-12 text-right text-xs font-black text-white">${m.prob}%</span>
+            </div>
+            <div class="sm:w-3/12 text-right">
+              ${badgeRight}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const marcadoresHtml = mc.marcadores_exactos_mas_probables.map(m =>
+        `<span class="px-2.5 py-1 rounded-lg bg-[#0b1120] border border-slate-800 text-xs font-mono">
+          <strong class="text-cyan-400">${m.marcador}</strong> (${m.probabilidad_pct}%)
+        </span>`
+      ).join("");
+
+      const bajasL = (extra.bajas_y_lesiones_reportadas?.local || []).join(", ") || "Sin bajas confirmadas de impacto";
+      const bajasV = (extra.bajas_y_lesiones_reportadas?.visitante || []).join(", ") || "Sin bajas confirmadas de impacto";
+
+      return `
+        <div class="card-dark rounded-3xl p-6 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div>
+              <div class="text-xs font-black uppercase tracking-wider text-emerald-400">
+                LA MAÑA PICKS · PREMIER DIXON-COLES + ELO (25,000 SIMS)
+              </div>
+              <div class="text-xs text-slate-400 mt-1">
+                xG Proy: <strong class="text-white">${elo.xg_proyectado_local} – ${elo.xg_proyectado_visitante}</strong> | Elo: ${locMeta.abbr} (${elo.elo_local}) vs ${visMeta.abbr} (${elo.elo_visitante}) | Neutralización Táctica: ${tact?.indice_neutralizacion_mutua || 0}
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <img src="${locMeta.logo}" class="w-8 h-8 object-contain" />
+                <span class="font-black text-white text-sm">${locMeta.abbr}</span>
+              </div>
+              <span class="text-xs font-bold text-slate-500">VS</span>
+              <div class="flex items-center gap-2">
+                <span class="font-black text-white text-sm">${visMeta.abbr}</span>
+                <img src="${visMeta.logo}" class="w-8 h-8 object-contain" />
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-[#060913] border border-slate-800 rounded-2xl p-4 text-xs space-y-1.5">
+            <div>✅ <span class="text-slate-300">Bajas ${locMeta.nombre}:</span> <strong class="text-white">${bajasL}</strong></div>
+            <div>⚠️ <span class="text-slate-300">Bajas ${visMeta.nombre}:</span> <strong class="text-white">${bajasV}</strong></div>
+            <div class="pt-1 text-cyan-300">
+              📊 Tabla: <strong>${locMeta.abbr} #${tabla.local?.posicion_actual || "-"}</strong> (${tabla.local?.contexto_clasificacion || "-"}) • <strong>${visMeta.abbr} #${tabla.visitante?.posicion_actual || "-"}</strong> (${tabla.visitante?.contexto_clasificacion || "-"})
+            </div>
+          </div>
+
+          <div>
+            <div class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400 mb-2">
+              PROBABILIDADES REALES DEL MODELO VS. VALOR DE MERCADO
+            </div>
+            <div>${barrasHtml}</div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-cyan-950/30 border border-cyan-500/50 rounded-2xl p-5 flex items-center justify-between cyan-glow">
+              <div>
+                <div class="text-[10px] font-extrabold uppercase tracking-widest text-cyan-400">
+                  🛡️ APUESTA MÁS SEGURA (MAYOR PROBABILIDAD)
+                </div>
+                <div class="text-lg font-black text-white mt-1">${evalData.masSegura.nombre}</div>
+                <div class="text-xs text-slate-300 mt-0.5">Cuota mínima recomendada: @${evalData.masSegura.cuotaJusta}</div>
+              </div>
+              <div class="text-2xl font-black text-cyan-400">${evalData.masSegura.prob}%</div>
+            </div>
+
+            <div class="bg-emerald-950/30 border border-emerald-500/50 rounded-2xl p-5 flex items-center justify-between">
+              ${
+                evalData.mejorValor
+                  ? `<div>
+                      <div class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">
+                        💎 MEJOR VALOR MATEMÁTICO EN TU CASINO
+                      </div>
+                      <div class="text-lg font-black text-white mt-1">${evalData.mejorValor.nombre}</div>
+                      <div class="text-xs text-slate-300 mt-0.5">Prob: ${evalData.mejorValor.prob}% • Cuota: @${evalData.mejorValor.cuotaUser.toFixed(2)}</div>
+                    </div>
+                    <div class="text-xl font-black text-emerald-400">${evalData.mejorValor.evPct > 0 ? '+' + evalData.mejorValor.evPct : evalData.mejorValor.evPct}% EV</div>`
+                  : `<div>
+                      <div class="text-[10px] font-extrabold uppercase tracking-widest text-amber-400">
+                        💡 CONOCE EL VALOR (+EV) DE TU CASINO
+                      </div>
+                      <div class="text-xs text-slate-300 mt-1">Ingresa las cuotas de tu casa de apuestas arriba para detectar automáticamente qué pick cumple ELITE BET o VALUE BET.</div>
+                    </div>`
+              }
+            </div>
+          </div>
+
+          <div class="bg-[#060913] border border-slate-800 rounded-2xl p-4 space-y-3 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="font-bold text-slate-300">Marcadores Exactos Más Probables:</span>
+              <div class="flex flex-wrap gap-1.5">${marcadoresHtml}</div>
+            </div>
+            <div class="text-slate-300 italic border-t border-slate-800/80 pt-2.5">
+              ⚽ <strong>Choque Táctico:</strong> ${tact?.lectura_choque_estilos || ""}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function mostrarAnimacionAnalisis(locMeta, visMeta, dep, onFinishCallback) {
+      const modal = document.getElementById("modalAnimacion");
+      const bar = document.getElementById("animProgressBar");
+      const logsDiv = document.getElementById("animLogsList");
+      document.getElementById("animAbbrLocal").textContent = locMeta.abbr;
+      document.getElementById("animAbbrVisita").textContent = visMeta.abbr;
+
+      const elo = dep.fuerzas_y_elo_dinamico;
+      const mc = dep.simulacion_monte_carlo;
+      const tact = dep.estilos_de_juego_y_neutralizacion;
+
+      const pasos = [
+        `▸ Sincronizando temporadas 2025-26 + 2026-27 Premier League`,
+        `▸ Fuerzas Ataque/Defensa · ${locMeta.abbr} (${elo.fuerza_ataque_local}/${elo.fuerza_defensa_local}) · ${visMeta.abbr} (${elo.fuerza_ataque_visitante}/${elo.fuerza_defensa_visitante})`,
+        `▸ Leyendo noticias, lesiones y tabla de posiciones en vivo`,
+        `▸ Elo Dinámico · ${elo.elo_local} vs ${elo.elo_visitante} (Dif: ${elo.diferencial_elo})`,
+        `▸ Dixon-Coles + Poisson xG · Proy ${elo.xg_proyectado_local}–${elo.xg_proyectado_visitante} goles`,
+        `▸ Ejecutando 25,000 simulaciones Monte Carlo → ${locMeta.abbr} ${mc.probabilidades_1X2_pct.local_1}% | X ${mc.probabilidades_1X2_pct.empate_X}% | ${visMeta.abbr} ${mc.probabilidades_1X2_pct.visita_2}%`,
+        `▸ ${tact?.lectura_choque_estilos?.slice(0, 75) || "Evaluando neutralización táctica"}...`
+      ];
+
+      bar.style.width = "10%";
+      logsDiv.innerHTML = "";
+      modal.classList.remove("hidden");
+      pendingRenderCallback = onFinishCallback;
+
+      let step = 0;
+      function avanzarPaso() {
+        if (step < pasos.length) {
+          logsDiv.innerHTML += `<div class="text-cyan-200/90">${pasos[step]}</div>`;
+          bar.style.width = `${Math.round(((step + 1) / pasos.length) * 100)}%`;
+          step++;
+          animTimeout = setTimeout(avanzarPaso, 320);
+        } else {
+          animTimeout = setTimeout(() => {
+            saltarAnimacion();
+          }, 350);
+        }
+      }
+      avanzarPaso();
+    }
+
+    function saltarAnimacion() {
+      if (animTimeout) clearTimeout(animTimeout);
+      document.getElementById("modalAnimacion").classList.add("hidden");
+      if (pendingRenderCallback) {
+        pendingRenderCallback();
+        pendingRenderCallback = null;
+      }
+    }
+
+    async function iniciarAnalisisSimulador() {
+      const locKey = document.getElementById("simSelectLocal").value;
+      const visKey = document.getElementById("simSelectVisita").value;
+      if (!locKey || !visKey || locKey === visKey) {
+        alert("Selecciona dos equipos distintos.");
+        return;
+      }
+
+      const userOdds = {
+        odd_1: parseCuotaUsuario(document.getElementById("odd_1").value),
+        odd_X: parseCuotaUsuario(document.getElementById("odd_X").value),
+        odd_2: parseCuotaUsuario(document.getElementById("odd_2").value),
+        odd_1X: parseCuotaUsuario(document.getElementById("odd_1X").value),
+        odd_X2: parseCuotaUsuario(document.getElementById("odd_X2").value),
+        odd_O25: parseCuotaUsuario(document.getElementById("odd_O25").value),
+        odd_U25: parseCuotaUsuario(document.getElementById("odd_U25").value),
+        odd_BTTS_Y: parseCuotaUsuario(document.getElementById("odd_BTTS_Y").value),
+        odd_BTTS_N: parseCuotaUsuario(document.getElementById("odd_BTTS_N").value)
+      };
+
+      const cont = document.getElementById("simResultadoContainer");
+      cont.innerHTML = `<div class="text-center py-6 text-cyan-400 text-xs font-bold">Consultando motor estadístico en vivo...</div>`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/premier/simular/${encodeURIComponent(locKey)}/${encodeURIComponent(visKey)}`);
+        const data = await res.json();
+        const locMeta = getTeamMeta(locKey);
+        const visMeta = getTeamMeta(visKey);
+        const info = { local: locMeta.nombre, visitante: visMeta.nombre, local_modelo: locKey, visitante_modelo: visKey };
+
+        mostrarAnimacionAnalisis(locMeta, visMeta, data.bloque_2_deportivo_y_extracancha, () => {
+          cont.innerHTML = renderPanelResultadosEstiloPro(info, data.bloque_1_mercado_cuotas, data.bloque_2_deportivo_y_extracancha, userOdds);
+          cont.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      } catch (e) {
+        cont.innerHTML = `<div class="text-rose-400 text-xs p-4">Error ejecutando simulación: ${e.message}</div>`;
+      }
+    }
+
     function obtenerMejorPickDeportivo(deportivo, locAbbr, visAbbr) {
       const probs = deportivo.simulacion_monte_carlo.probabilidades_1X2_pct;
       const goles = deportivo.simulacion_monte_carlo.mercados_goles_pct;
-
       const candidatos = [
+        { label: `${locAbbr} o Empate (1X)`, prob: Number((probs.local_1 + probs.empate_X).toFixed(1)), desc: "COBERTURA DE MAYOR PROBABILIDAD" },
+        { label: `${visAbbr} o Empate (X2)`, prob: Number((probs.visita_2 + probs.empate_X).toFixed(1)), desc: "COBERTURA VISITANTE SÓLIDA" },
         { label: `${locAbbr} gana (1)`, prob: probs.local_1, desc: "DOMINA EN PROYECCIÓN DEPORTIVA" },
         { label: `${visAbbr} gana (2)`, prob: probs.visita_2, desc: "VENTAJA ESTADÍSTICA DE VISITA" },
         { label: `Over 2.5 Goles`, prob: goles.over_2_5, desc: "ALTA PROYECCIÓN DE xG COMBINADO" },
-        { label: `Under 2.5 Goles`, prob: goles.under_2_5, desc: "PARTIDO CERRADO / NEUTRALIZACIÓN" },
-        { label: `Ambos Anotan SÍ`, prob: goles.ambos_anotan_SI, desc: "AMBOS ATAQUES CON ALTA EFICACIA" }
+        { label: `Under 2.5 Goles`, prob: goles.under_2_5, desc: "PARTIDO CERRADO / NEUTRALIZACIÓN" }
       ];
       candidatos.sort((a, b) => b.prob - a.prob);
       return candidatos[0];
@@ -535,7 +942,7 @@
 
       const hora = info.fecha_utc
         ? new Date(info.fecha_utc).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        : "Simulación";
+        : "Hoy";
 
       return `
         <div class="card-dark rounded-2xl p-5 flex flex-col justify-between transition">
@@ -566,7 +973,7 @@
             </div>
 
             <div class="mt-3 bg-cyan-950/30 border border-cyan-500/40 rounded-xl p-3.5">
-              <div class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">PICK DEPORTIVO</div>
+              <div class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">OPCIÓN MÁS SEGURA</div>
               <div class="flex items-center justify-between mt-1">
                 <span class="text-sm font-extrabold text-white">${bestPick.label}</span>
                 <span class="text-base font-black text-white">${bestPick.prob}%</span>
@@ -581,203 +988,27 @@
       `;
     }
 
-    function construirHtmlDetalleCompleto(info, mercado, dep) {
-      const mc = dep.simulacion_monte_carlo;
-      const elo = dep.fuerzas_y_elo_dinamico;
-      const hist = dep.estadisticas_historicas_y_forma;
-      const extra = dep.factores_extra_cancha;
-      const tact = dep.estilos_de_juego_y_neutralizacion;
-      const tempAvg = hist.promedios_goles_temporada_completa || {};
-      const h2h = hist.h2h_ultimos_10 || {};
-      const tabla = extra.presion_tabla_y_clasificacion || {};
-
-      const cuotasHtml = mercado.probabilidad_implicita_justa_pct
-        ? `<div class="grid grid-cols-3 gap-2 text-center my-3">
-            <div class="bg-[#060913] p-3 rounded-xl border border-slate-800">
-              <div class="text-[10px] text-slate-400">LOCAL (1)</div>
-              <div class="text-base font-black text-amber-400">${mercado.cuotas_decimales.local_1}</div>
-              <div class="text-[11px] text-slate-300">Imp: ${mercado.probabilidad_implicita_justa_pct.local_1}%</div>
-            </div>
-            <div class="bg-[#060913] p-3 rounded-xl border border-slate-800">
-              <div class="text-[10px] text-slate-400">EMPATE (X)</div>
-              <div class="text-base font-black text-amber-400">${mercado.cuotas_decimales.empate_X}</div>
-              <div class="text-[11px] text-slate-300">Imp: ${mercado.probabilidad_implicita_justa_pct.empate_X}%</div>
-            </div>
-            <div class="bg-[#060913] p-3 rounded-xl border border-slate-800">
-              <div class="text-[10px] text-slate-400">VISITA (2)</div>
-              <div class="text-base font-black text-amber-400">${mercado.cuotas_decimales.visita_2}</div>
-              <div class="text-[11px] text-slate-300">Imp: ${mercado.probabilidad_implicita_justa_pct.visita_2}%</div>
-            </div>
-          </div>
-          <div class="text-xs text-slate-400">Comisión Casa (Vig): <strong class="text-white">${mercado.margen_casa_vig_pct}%</strong> • Línea Goles: <strong class="text-white">${mercado.linea_goles_mercado || "N/A"}</strong></div>`
-        : `<div class="bg-[#060913] border border-slate-800 rounded-xl p-3 text-xs text-amber-300 my-2">
-            ${mercado.estado_cuotas || "Sin cuotas activas"} • Línea Goles: ${mercado.linea_goles_mercado || "N/A"}
-          </div>`;
-
-      const cierresHtml = (mercado.historico_cuotas_cierre_h2h || []).map(c =>
-        `<div class="flex justify-between text-xs py-1.5 border-b border-slate-800/60">
-          <span>${c.fecha}: ${c.local} vs ${c.visita} (${c.resultado_real})</span>
-          <span class="text-amber-400 font-mono">${c.cierre_pinnacle_1X2}</span>
-        </div>`
-      ).join("") || `<div class="text-xs text-slate-500">Sin cierres históricos registrados</div>`;
-
-      const marcadoresHtml = mc.marcadores_exactos_mas_probables.map(m =>
-        `<span class="px-2.5 py-1 rounded-lg bg-[#060913] border border-slate-800 text-xs font-mono">
-          <strong class="text-cyan-400">${m.marcador}</strong> (${m.probabilidad_pct}%)
-        </span>`
-      ).join("");
-
-      const h2hDuelos = (h2h.ultimos_duelos || []).map(d =>
-        `<span class="px-2 py-1 rounded bg-[#060913] border border-slate-800 text-xs font-mono">${d.fecha}: ${d.local} <strong>${d.marcador}</strong> ${d.visitante}</span>`
-      ).join("") || `<span class="text-xs text-slate-500">Sin enfrentamientos directos recientes</span>`;
-
-      const bajasL = (extra.bajas_y_lesiones_reportadas?.local || []).join(", ") || "Sin bajas oficiales";
-      const bajasV = (extra.bajas_y_lesiones_reportadas?.visitante || []).join(", ") || "Sin bajas oficiales";
-      const exJug = (extra.jugadores_pasado_en_ambos_equipos || []).map(j => `${j.jugador} (${j.equipo_actual})`).join(", ") || "Ninguno detectado";
-
-      return `
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-5 bg-[#060913] border border-slate-800 rounded-2xl p-5 space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400">1. ANÁLISIS DEL MERCADO (CUOTAS)</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">${mercado.proveedor}</span>
-            </div>
-            ${cuotasHtml}
-            <div class="pt-3 border-t border-slate-800">
-              <div class="text-[11px] font-bold uppercase text-slate-400 mb-2">Cierres Históricos Pinnacle (H2H)</div>
-              ${cierresHtml}
-            </div>
-          </div>
-
-          <div class="lg:col-span-7 bg-[#060913] border border-slate-800 rounded-2xl p-5 space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-400">2. ANÁLISIS DEPORTIVO Y EXTRA-CANCHA</span>
-              <span class="text-[11px] text-slate-400">25,000 Sims Monte Carlo</span>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2 text-center">
-              <div class="bg-cyan-950/30 border border-cyan-500/30 p-3 rounded-xl">
-                <div class="text-[11px] text-cyan-300">Local (1)</div>
-                <div class="text-lg font-black text-white">${mc.probabilidades_1X2_pct.local_1}%</div>
-                <div class="text-[10px] text-slate-400">xG: ${elo.xg_proyectado_local} | Elo: ${elo.elo_local}</div>
-              </div>
-              <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
-                <div class="text-[11px] text-slate-400">Empate (X)</div>
-                <div class="text-lg font-black text-white">${mc.probabilidades_1X2_pct.empate_X}%</div>
-                <div class="text-[10px] text-slate-400">Dif Elo: ${elo.diferencial_elo}</div>
-              </div>
-              <div class="bg-indigo-950/30 border border-indigo-500/30 p-3 rounded-xl">
-                <div class="text-[11px] text-indigo-300">Visita (2)</div>
-                <div class="text-lg font-black text-white">${mc.probabilidades_1X2_pct.visita_2}%</div>
-                <div class="text-[10px] text-slate-400">xG: ${elo.xg_proyectado_visitante} | Elo: ${elo.elo_visitante}</div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2 text-center text-xs">
-              <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Over 2.5</span>
-                <strong class="text-cyan-400">${mc.mercados_goles_pct.over_2_5}%</strong>
-              </div>
-              <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Under 2.5</span>
-                <strong>${mc.mercados_goles_pct.under_2_5}%</strong>
-              </div>
-              <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">BTTS SÍ</span>
-                <strong class="text-cyan-400">${mc.mercados_goles_pct.ambos_anotan_SI}%</strong>
-              </div>
-              <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
-                <span class="text-slate-400 block text-[10px]">Over 1.5</span>
-                <strong>${mc.mercados_goles_pct.over_1_5}%</strong>
-              </div>
-            </div>
-
-            <div>
-              <span class="text-[11px] text-slate-400 block mb-1">Marcadores Exactos Más Probables:</span>
-              <div class="flex flex-wrap gap-1.5">${marcadoresHtml}</div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-              <div>
-                <span class="text-slate-400">Posición Local:</span> <strong class="text-white">#${tabla.local?.posicion_actual || "-"} (${tabla.local?.puntos || 0} pts)</strong>
-                <div class="text-cyan-300 text-[11px]">${tabla.local?.contexto_clasificacion || ""}</div>
-              </div>
-              <div>
-                <span class="text-slate-400">Posición Visita:</span> <strong class="text-white">#${tabla.visitante?.posicion_actual || "-"} (${tabla.visitante?.puntos || 0} pts)</strong>
-                <div class="text-indigo-300 text-[11px]">${tabla.visitante?.contexto_clasificacion || ""}</div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-              <div class="space-y-1">
-                <div class="font-bold text-cyan-400">Local · Forma y Tiros</div>
-                <div>Prom. Goles Local Temp: <strong>${tempAvg.local?.promedio_goles_anotados_local_temporada ?? "-"} / ${tempAvg.local?.promedio_goles_recibidos_local_temporada ?? "-"}</strong></div>
-                <div>Últimos 10: <span class="font-mono">${hist.local_general_10?.racha_ultimos_10 || "-"}</span> (${hist.local_general_10?.puntos_ultimos_10 || 0} pts)</div>
-                <div>En Casa (10): <strong>${hist.local_en_casa_10?.record_ultimos_10 || "-"}</strong> | SOT: <strong>${hist.local_en_casa_10?.promedio_tiros_puerta_favor || 0}</strong></div>
-                <div>Descanso real: <strong>${hist.local_general_10?.dias_descanso_reales || "-"} días</strong></div>
-              </div>
-              <div class="space-y-1">
-                <div class="font-bold text-indigo-400">Visita · Forma y Tiros</div>
-                <div>Prom. Goles Visita Temp: <strong>${tempAvg.visitante?.promedio_goles_anotados_visita_temporada ?? "-"} / ${tempAvg.visitante?.promedio_goles_recibidos_visita_temporada ?? "-"}</strong></div>
-                <div>Últimos 10: <span class="font-mono">${hist.visita_general_10?.racha_ultimos_10 || "-"}</span> (${hist.visita_general_10?.puntos_ultimos_10 || 0} pts)</div>
-                <div>De Visita (10): <strong>${hist.visita_fuera_10?.record_ultimos_10 || "-"}</strong> | SOT: <strong>${hist.visita_fuera_10?.promedio_tiros_puerta_favor || 0}</strong></div>
-                <div>Descanso real: <strong>${hist.visita_general_10?.dias_descanso_reales || "-"} días</strong></div>
-              </div>
-            </div>
-
-            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1">
-              <div class="font-bold text-cyan-400">Neutralización Táctica (Índice: ${tact?.indice_neutralizacion_mutua || 0})</div>
-              <div><strong>Local:</strong> ${tact?.perfil_tactico_local?.estilo_detectado || "-"}</div>
-              <div><strong>Visita:</strong> ${tact?.perfil_tactico_visitante?.estilo_detectado || "-"}</div>
-              <div class="text-slate-300 italic">${tact?.lectura_choque_estilos || ""}</div>
-            </div>
-
-            <div class="text-xs space-y-1 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-              <div><strong class="text-amber-300">Rivalidad:</strong> ${extra.rivalidad?.nombre_rivalidad || "-"}</div>
-              <div><strong class="text-rose-400">Bajas Local:</strong> ${bajasL}</div>
-              <div><strong class="text-rose-400">Bajas Visita:</strong> ${bajasV}</div>
-              <div><strong class="text-emerald-300">Ley del Ex:</strong> ${exJug}</div>
-              <div class="pt-1 flex flex-wrap gap-1.5">${h2hDuelos}</div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
     function abrirModalDetalle(index) {
       const m = jornadaCache[index];
       if (!m) return;
-      document.getElementById("modalTitulo").textContent = `${m.partido_info.local} vs ${m.partido_info.visitante} · Auditoría Dual`;
-      document.getElementById("modalContenido").innerHTML = construirHtmlDetalleCompleto(
-        m.partido_info, m.bloque_1_mercado_cuotas, m.bloque_2_deportivo_y_extracancha
-      );
-      document.getElementById("modalDetalle").classList.remove("hidden");
+      const loc = getTeamMeta(m.partido_info.local_modelo);
+      const vis = getTeamMeta(m.partido_info.visitante_modelo);
+      const cuotasMkt = m.bloque_1_mercado_cuotas?.cuotas_decimales || {};
+
+      mostrarAnimacionAnalisis(loc, vis, m.bloque_2_deportivo_y_extracancha, () => {
+        document.getElementById("modalTitulo").textContent = `${m.partido_info.local} vs ${m.partido_info.visitante}`;
+        document.getElementById("modalContenido").innerHTML = renderPanelResultadosEstiloPro(
+          m.partido_info,
+          m.bloque_1_mercado_cuotas,
+          m.bloque_2_deportivo_y_extracancha,
+          { odd_1: cuotasMkt.local_1 || 0, odd_X: cuotasMkt.empate_X || 0, odd_2: cuotasMkt.visita_2 || 0 }
+        );
+        document.getElementById("modalDetalle").classList.remove("hidden");
+      });
     }
 
     function cerrarModal() {
       document.getElementById("modalDetalle").classList.add("hidden");
-    }
-
-    async function ejecutarSimulacion() {
-      const locKey = document.getElementById("simSelectLocal").value;
-      const visKey = document.getElementById("simSelectVisita").value;
-      if (!locKey || !visKey || locKey === visKey) {
-        alert("Selecciona dos equipos distintos.");
-        return;
-      }
-      const cont = document.getElementById("simResultadoContainer");
-      cont.innerHTML = `<div class="text-center py-8 text-cyan-400 text-xs font-bold">Ejecutando 25,000 simulaciones Monte Carlo para ${locKey} vs ${visKey}...</div>`;
-
-      try {
-        const res = await fetch(`${API_BASE}/api/premier/simular/${encodeURIComponent(locKey)}/${encodeURIComponent(visKey)}`);
-        const data = await res.json();
-        const locMeta = getTeamMeta(locKey);
-        const visMeta = getTeamMeta(visKey);
-        const info = { local: locMeta.nombre, visitante: visMeta.nombre };
-        cont.innerHTML = construirHtmlDetalleCompleto(info, data.bloque_1_mercado_cuotas, data.bloque_2_deportivo_y_extracancha);
-      } catch (e) {
-        cont.innerHTML = `<div class="text-rose-400 text-xs p-4">Error simulando: ${e.message}</div>`;
-      }
     }
 
     async function cargarTodoPremier() {
@@ -792,9 +1023,7 @@
 
         const dataJornada = await resJornada.json();
         const dataLiga = await resLiga.json();
-
         jornadaCache = dataJornada.partidos || [];
-        ligaInfoCache = dataLiga;
 
         const fechasDiv = document.getElementById("fechasPills");
         const rankDiv = document.getElementById("rankingDiaList");
