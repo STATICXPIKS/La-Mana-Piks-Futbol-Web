@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Maña Piks - Premier League Analytics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+  <!-- Header -->
+  <header class="bg-slate-900 border-b border-emerald-500/30 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400 font-bold text-xl">
+          ⚽
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white">LA MAÑA PIKS <span class="text-emerald-400">PREMIER LEAGUE</span></h1>
+          <p class="text-xs text-slate-400">Motor Cuantitativo Dual: Mercado (Cuotas) vs. Rendimiento Deportivo y Extra-Cancha</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="cargarJornada()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition">
+          Actualizar Jornada
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
+    <!-- Simulador de Cruce Personalizado -->
+    <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-400 mb-3">Simulador Manual de Partidos (25,000 Iteraciones Monte Carlo)</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <select id="selectLocal" class="bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+          <option value="">Selecciona Equipo Local...</option>
+        </select>
+        <select id="selectVisita" class="bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+          <option value="">Selecciona Equipo Visitante...</option>
+        </select>
+        <button onclick="simularCruce()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl px-4 py-2.5 text-sm transition">
+          Analizar Cruce Independiente
+        </button>
+      </div>
+    </section>
+
+    <!-- Estado de Carga -->
+    <div id="loader" class="text-center py-12">
+      <div class="inline-block w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+      <p class="text-slate-300 font-medium">Descargando estadísticas reales, cuotas y noticias de la Premier League...</p>
+      <p class="text-xs text-slate-500 mt-1">(Si el servidor gratuito en Render estaba dormido, puede tardar ~40 segundos en despertar)</p>
+    </div>
+
+    <!-- Contenedor de Resultados -->
+    <div id="contenedorPartidos" class="space-y-8 hidden"></div>
+  </main>
+
+  <script>
+    const API_BASE = "https://la-mana-piks-futbol.onrender.com";
+    const EQUIPOS_PL = [
+      "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
+      "Chelsea", "Coventry", "Crystal Palace", "Everton", "Fulham",
+      "Hull", "Ipswich", "Leeds", "Liverpool", "Man City",
+      "Man United", "Newcastle", "Nott'm Forest", "Sunderland", "Tottenham"
+    ];
+
+    // Llenar selectores
+    const selL = document.getElementById("selectLocal");
+    const selV = document.getElementById("selectVisita");
+    EQUIPOS_PL.forEach(eq => {
+      selL.innerHTML += `<option value="${eq}">${eq}</option>`;
+      selV.innerHTML += `<option value="${eq}">${eq}</option>`;
+    });
+
+    function renderTarjetaPartido(info, mercado, deportivo) {
+      const mc = deportivo.simulacion_monte_carlo;
+      const elo = deportivo.fuerzas_y_elo_dinamico;
+      const hist = deportivo.estadisticas_historicas_y_forma;
+      const extra = deportivo.factores_extra_cancha;
+      const tact = deportivo.estilos_de_juego_y_neutralizacion;
+
+      const cuotasHtml = mercado.probabilidad_implicita_justa_pct
+        ? `
+          <div class="grid grid-cols-3 gap-2 text-center my-3">
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <div class="text-xs text-slate-400">Local (1)</div>
+              <div class="text-lg font-bold text-amber-400">${mercado.cuotas_decimales.local_1}</div>
+              <div class="text-xs text-slate-300">Prob: ${mercado.probabilidad_implicita_justa_pct.local_1}%</div>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <div class="text-xs text-slate-400">Empate (X)</div>
+              <div class="text-lg font-bold text-amber-400">${mercado.cuotas_decimales.empate_X}</div>
+              <div class="text-xs text-slate-300">Prob: ${mercado.probabilidad_implicita_justa_pct.empate_X}%</div>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <div class="text-xs text-slate-400">Visita (2)</div>
+              <div class="text-lg font-bold text-amber-400">${mercado.cuotas_decimales.visita_2}</div>
+              <div class="text-xs text-slate-300">Prob: ${mercado.probabilidad_implicita_justa_pct.visita_2}%</div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400">Comisión (Vig) de la casa: <span class="text-slate-200 font-semibold">${mercado.margen_casa_vig_pct}%</span> | Línea Goles: <span class="text-slate-200 font-semibold">${mercado.linea_goles_mercado || "N/A"}</span></p>
+        `
+        : `<div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-amber-300 my-3">
+            ${mercado.estado_cuotas || "Cuotas 1X2 pendientes"} | Línea Goles: ${mercado.linea_goles_mercado || "N/A"} | Cuota Empate: ${mercado.cuotas_decimales?.empate_X || "N/A"} | Visita: ${mercado.cuotas_decimales?.visita_2 || "N/A"}
+           </div>`;
+
+      const h2hCierres = (mercado.historico_cuotas_cierre_h2h || []).map(c =>
+        `<li class="flex justify-between text-xs py-1 border-b border-slate-800/60">
+          <span>${c.fecha}: ${c.local} vs ${c.visita} (${c.resultado_real})</span>
+          <span class="text-amber-400 font-mono">${c.cierre_pinnacle_1X2}</span>
+        </li>`
+      ).join("") || `<li class="text-xs text-slate-500">Sin cierres históricos recientes en Premier League</li>`;
+
+      const marcadoresHtml = mc.marcadores_exactos_mas_probables.map(m =>
+        `<span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono">
+          <strong class="text-emerald-400">${m.marcador}</strong> (${m.probabilidad_pct}%)
+        </span>`
+      ).join("");
+
+      const noticiasLocal = (extra.prensa_lesiones_y_rumores_rss?.noticias_y_alertas_local || []).map(n =>
+        `<li class="text-xs text-slate-300">• [${n.fuente}] ${n.titular}</li>`
+      ).join("") || `<li class="text-xs text-slate-500">Sin alertas recientes en prensa</li>`;
+
+      const noticiasVisita = (extra.prensa_lesiones_y_rumores_rss?.noticias_y_alertas_visitante || []).map(n =>
+        `<li class="text-xs text-slate-300">• [${n.fuente}] ${n.titular}</li>`
+      ).join("") || `<li class="text-xs text-slate-500">Sin alertas recientes en prensa</li>`;
+
+      return `
+        <article class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <!-- Cabecera Partido -->
+          <div class="bg-slate-800/60 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-2 border-b border-slate-700/60">
+            <div>
+              <span class="text-xs uppercase tracking-wider text-emerald-400 font-semibold">${info.estado || "Simulación"} • ${info.fecha_utc ? new Date(info.fecha_utc).toLocaleString() : "Hoy"}</span>
+              <h3 class="text-2xl font-bold text-white mt-0.5">${info.local} <span class="text-slate-500 text-lg font-normal">vs</span> ${info.visitante}</h3>
+            </div>
+            <div class="text-right text-xs text-slate-300 space-y-1">
+              <div>Récord Temporada: <span class="font-semibold text-white">${info.record_local || "-"}</span> vs <span class="font-semibold text-white">${info.record_visita || "-"}</span></div>
+              <div class="text-indigo-300">${extra.rivalidad?.nombre_rivalidad || ""}</div>
+            </div>
+          </div>
+
+          <!-- 2 Columnas Independientes -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-800">
+            
+            <!-- COLUMNA 1: SOLO MERCADO Y CUOTAS -->
+            <div class="lg:col-span-5 p-6 bg-slate-900/40 space-y-4">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-amber-400">1. Análisis del Mercado (Cuotas)</h4>
+                <span class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">${mercado.proveedor}</span>
+              </div>
+              ${cuotasHtml}
+              <div class="pt-3 border-t border-slate-800">
+                <h5 class="text-xs font-semibold uppercase text-slate-400 mb-2">Historial Cuotas Cierre Pinnacle (H2H)</h5>
+                <ul>${h2hCierres}</ul>
+              </div>
+            </div>
+
+            <!-- COLUMNA 2: SOLO DEPORTIVO, TÁCTICO Y EXTRA-CANCHA -->
+            <div class="lg:col-span-7 p-6 space-y-5">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-emerald-400">2. Análisis Deportivo y Extra-Cancha</h4>
+                <span class="text-xs text-slate-400">Monte Carlo: 25,000 sims</span>
+              </div>
+
+              <!-- Probabilidades 1X2 del Modelo -->
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-emerald-950/30 border border-emerald-500/30 p-3 rounded-xl">
+                  <div class="text-xs text-emerald-300">Gana Local</div>
+                  <div class="text-xl font-extrabold text-white">${mc.probabilidades_1X2_pct.local_1}%</div>
+                  <div class="text-xs text-slate-400">xG: ${elo.xg_proyectado_local} | Elo: ${elo.elo_local}</div>
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl">
+                  <div class="text-xs text-slate-400">Empate</div>
+                  <div class="text-xl font-extrabold text-white">${mc.probabilidades_1X2_pct.empate_X}%</div>
+                  <div class="text-xs text-slate-400">Dif Elo: ${elo.diferencial_elo}</div>
+                </div>
+                <div class="bg-indigo-950/30 border border-indigo-500/30 p-3 rounded-xl">
+                  <div class="text-xs text-indigo-300">Gana Visita</div>
+                  <div class="text-xl font-extrabold text-white">${mc.probabilidades_1X2_pct.visita_2}%</div>
+                  <div class="text-xs text-slate-400">xG: ${elo.xg_proyectado_visitante} | Elo: ${elo.elo_visitante}</div>
+                </div>
+              </div>
+
+              <!-- Mercados de Goles y Marcadores -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block">Over 2.5 Goles</span>
+                  <strong class="text-sm text-emerald-400">${mc.mercados_goles_pct.over_2_5}%</strong>
+                </div>
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block">Under 2.5 Goles</span>
+                  <strong class="text-sm text-slate-200">${mc.mercados_goles_pct.under_2_5}%</strong>
+                </div>
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block">Ambos Anotan SÍ</span>
+                  <strong class="text-sm text-emerald-400">${mc.mercados_goles_pct.ambos_anotan_SI}%</strong>
+                </div>
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block">Over 1.5 Goles</span>
+                  <strong class="text-sm text-slate-200">${mc.mercados_goles_pct.over_1_5}%</strong>
+                </div>
+              </div>
+
+              <div>
+                <span class="text-xs text-slate-400 block mb-1.5">Marcadores Exactos Más Probables:</span>
+                <div class="flex flex-wrap gap-2">${marcadoresHtml}</div>
+              </div>
+
+              <!-- Estadísticas Reales (Últimos 10, Local/Visita y Tiros a Puerta) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
+                <div>
+                  <div class="font-bold text-emerald-400 mb-1">${info.local} (Local)</div>
+                  <div>Racha últ. 10: <span class="font-mono text-white">${hist.local_general_10?.racha_ultimos_10 || "-"}</span> (${hist.local_general_10?.puntos_ultimos_10 || 0} pts)</div>
+                  <div>En Casa últ. 10: <span class="text-white">${hist.local_en_casa_10?.record_ultimos_10 || "-"}</span></div>
+                  <div>Tiros a puerta casa: <span class="text-white">${hist.local_en_casa_10?.promedio_tiros_puerta_favor || 0} favor / ${hist.local_en_casa_10?.promedio_tiros_puerta_contra || 0} contra</span></div>
+                  <div>Descanso real: <span class="text-white">${hist.local_general_10?.dias_descanso_reales || "-"} días</span></div>
+                </div>
+                <div>
+                  <div class="font-bold text-indigo-400 mb-1">${info.visitante} (Visita)</div>
+                  <div>Racha últ. 10: <span class="font-mono text-white">${hist.visita_general_10?.racha_ultimos_10 || "-"}</span> (${hist.visita_general_10?.puntos_ultimos_10 || 0} pts)</div>
+                  <div>De Visita últ. 10: <span class="text-white">${hist.visita_fuera_10?.record_ultimos_10 || "-"}</span></div>
+                  <div>Tiros a puerta fuera: <span class="text-white">${hist.visita_fuera_10?.promedio_tiros_puerta_favor || 0} favor / ${hist.visita_fuera_10?.promedio_tiros_puerta_contra || 0} contra</span></div>
+                  <div>Descanso real: <span class="text-white">${hist.visita_general_10?.dias_descanso_reales || "-"} días</span></div>
+                </div>
+              </div>
+
+              <!-- Estilos de Juego y Neutralización -->
+              <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-1.5">
+                <div class="font-bold text-cyan-400">Choque Táctico y Neutralización (Índice: ${tact?.indice_neutralizacion_mutua || 0})</div>
+                <div><strong>${info.local}:</strong> ${tact?.perfil_tactico_local?.estilo_detectado || "-"}</div>
+                <div><strong>${info.visitante}:</strong> ${tact?.perfil_tactico_visitante?.estilo_detectado || "-"}</div>
+                <div class="text-slate-300 italic pt-1">${tact?.lectura_choque_estilos || ""}</div>
+              </div>
+
+              <!-- Prensa y Alertas Extra-Cancha -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+                <div>
+                  <span class="font-semibold text-slate-400 block mb-1">Noticias / Alertas ${info.local}:</span>
+                  <ul class="space-y-1">${noticiasLocal}</ul>
+                </div>
+                <div>
+                  <span class="font-semibold text-slate-400 block mb-1">Noticias / Alertas ${info.visitante}:</span>
+                  <ul class="space-y-1">${noticiasVisita}</ul>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    async function cargarJornada() {
+      const loader = document.getElementById("loader");
+      const cont = document.getElementById("contenedorPartidos");
+      loader.classList.remove("hidden");
+      cont.classList.add("hidden");
+
+      try {
+        const res = await fetch(`${API_BASE}/api/premier/jornada`);
+        const data = await res.json();
+        cont.innerHTML = data.partidos.map(p =>
+          renderTarjetaPartido(p.partido_info, p.bloque_1_mercado_cuotas, p.bloque_2_deportivo_y_extracancha)
+        ).join("");
+      } catch (err) {
+        cont.innerHTML = `<div class="p-4 bg-red-950/50 border border-red-500 rounded-xl text-red-200 text-sm">Error conectando con Render: ${err.message}</div>`;
+      } finally {
+        loader.classList.add("hidden");
+        cont.classList.remove("hidden");
+      }
+    }
+
+    async function simularCruce() {
+      const local = document.getElementById("selectLocal").value;
+      const visita = document.getElementById("selectVisita").value;
+      if (!local || !visita || local === visita) {
+        alert("Selecciona dos equipos diferentes.");
+        return;
+      }
+      const loader = document.getElementById("loader");
+      const cont = document.getElementById("contenedorPartidos");
+      loader.classList.remove("hidden");
+      cont.classList.add("hidden");
+
+      try {
+        const res = await fetch(`${API_BASE}/api/premier/simular/${encodeURIComponent(local)}/${encodeURIComponent(visita)}`);
+        const data = await res.json();
+        const info = { local, visitante: visita, estado: "Simulación Personalizada" };
+        cont.innerHTML = renderTarjetaPartido(info, data.bloque_1_mercado_cuotas, data.bloque_2_deportivo_y_extracancha);
+      } catch (err) {
+        cont.innerHTML = `<div class="p-4 bg-red-950/50 border border-red-500 rounded-xl text-red-200 text-sm">Error en simulación: ${err.message}</div>`;
+      } finally {
+        loader.classList.add("hidden");
+        cont.classList.remove("hidden");
+      }
+    }
+
+    // Cargar automáticamente al abrir
+    cargarJornada();
+  </script>
+</body>
+</html>
