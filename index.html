@@ -9,7 +9,6 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
     body { font-family: 'Inter', sans-serif; }
 
-    /* Identidad Verde Neón LA MAÑA PICKS */
     .neon-glow { box-shadow: 0 0 18px rgba(0, 255, 127, 0.45); }
     .neon-glow-sm { box-shadow: 0 0 12px rgba(0, 255, 127, 0.35); }
     .text-neon { color: #00FF7F; }
@@ -82,7 +81,6 @@
         INGRESA CÓDIGO DE ACCESO
       </h2>
 
-      <!-- 4 Círculos Indicadores Verde Neón -->
       <div id="pinDotsContainer" class="flex items-center justify-center gap-4 mt-5">
         <span id="dot-0" class="w-3.5 h-3.5 rounded-full border-2 border-[#00FF7F] transition-all duration-150"></span>
         <span id="dot-1" class="w-3.5 h-3.5 rounded-full border-2 border-[#00FF7F] transition-all duration-150"></span>
@@ -142,7 +140,7 @@
           MODELOS CUANTITATIVOS <span class="text-emerald-500">IA</span>
         </h1>
         <p class="text-slate-500 text-sm sm:text-base mt-2">
-          Simulaciones Monte Carlo (25,000 iteraciones), Dixon-Coles, Elo Dinámico, xG y auditoría de apuestas con valor (+EV).
+          Simulaciones Monte Carlo (25,000 iteraciones), Dixon-Coles, Elo Dinámico, xG y auditoría oficial desde el 25 Nov 2026.
         </p>
       </div>
 
@@ -263,7 +261,6 @@
           </div>
         </div>
 
-        <!-- Menú Pill Superior Verde Neón -->
         <div class="inline-flex flex-wrap items-center bg-[#0a110d] border border-[#1a2921] rounded-full p-1 gap-1">
           <button onclick="cambiarTab('partidos')" id="tabBtn-partidos" class="px-3.5 py-1.5 rounded-full text-xs font-black tracking-wider uppercase transition bg-neon text-slate-950 neon-glow">
             PARTIDOS
@@ -287,7 +284,7 @@
     <div class="max-w-7xl mx-auto px-4 pt-6">
       <div id="leagueLoader" class="text-center py-20">
         <div class="inline-block w-10 h-10 border-4 border-[#00FF7F] border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando jornada y probabilidades Dixon-Coles...</p>
+        <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando fechas reales de la jornada y probabilidades Dixon-Coles...</p>
       </div>
 
       <!-- ==================== PESTAÑA 1: PARTIDOS ==================== -->
@@ -319,7 +316,6 @@
             </div>
           </div>
 
-          <!-- Banner Oscuro Escudos con Aura Verde Neón -->
           <div class="bg-[#030604] border border-[#1a2921] rounded-2xl py-6 px-4 flex flex-col sm:flex-row items-center justify-around gap-6">
             <div class="flex flex-col items-center text-center">
               <img id="simEscudoLocal" src="" alt="Local" class="w-20 h-20 object-contain drop-shadow-[0_0_16px_rgba(0,255,127,0.38)]" />
@@ -409,17 +405,22 @@
         <div id="simResultadoContainer"></div>
       </div>
 
-      <!-- ==================== PESTAÑA 3: AUDITORÍA ==================== -->
+      <!-- ==================== PESTAÑA 3: AUDITORÍA OFICIAL EN VIVO ==================== -->
       <div id="tab-auditoria" class="hidden space-y-6">
         <div class="card-dark rounded-2xl p-5">
-          <div class="text-xs font-extrabold uppercase tracking-widest text-neon">
-            AUDITORÍA · QUÉ HABRÍA DICHO EL MODELO ANTES DE LOS JUEGOS
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="text-xs font-extrabold uppercase tracking-widest text-neon">
+              AUDITORÍA OFICIAL EN VIVO · DESDE EL 25 NOV 2026
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#0d1f15] text-neon border border-[#00FF7F]/40">
+              100% PRONÓSTICOS REALES PRE-JUEGO
+            </span>
           </div>
           <div id="auditoriaResumenHeader" class="text-sm font-bold text-white mt-2">
-            Calculando retrospectiva pre-juego...
+            Sincronizando pronósticos registrados...
           </div>
           <p class="text-xs text-slate-400 mt-1">
-            Calculado exclusivamente con datos previos a la jornada (sin conocer los resultados futuros). Toca ANALIZAR en cualquier partido para ver el desglose completo.
+            Esta sección registra únicamente los picks emitidos antes de cada partido a partir de hoy (25 Nov 2026). Al concluir cada encuentro, el sistema verifica el marcador real en ESPN y lo califica automáticamente con ✓ o ✗.
           </p>
         </div>
 
@@ -466,7 +467,7 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL ANIMACIÓN "ANALIZANDO EN TIEMPO REAL" (CANCHA VERDE NEÓN) ==================== -->
+  <!-- ==================== MODAL ANIMACIÓN "ANALIZANDO EN TIEMPO REAL" ==================== -->
   <div id="modalAnimacion" class="hidden fixed inset-0 z-[70] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-[#060b08] border border-[#00FF7F]/45 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6">
       <div class="flex items-center justify-between">
@@ -476,7 +477,6 @@
         </span>
       </div>
 
-      <!-- Cancha de Fútbol Verde Neón -->
       <div class="relative h-48 sm:h-56 rounded-2xl border-2 border-[#00FF7F]/70 bg-[#030805] overflow-hidden neon-glow">
         <div class="absolute inset-y-0 left-1/2 w-0.5 bg-[#00FF7F]/40"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border border-[#00FF7F]/40"></div>
@@ -608,7 +608,7 @@
     let partidosPorFecha = {};
     let fechasOrdenadas = [];
     let fechaSeleccionada = "";
-    let auditoriaCache = { fecha_etiqueta: "", total: 0, aciertos_pick: 0, aciertos_ml: 0, partidos: [] };
+    let auditoriaCache = { modelo_iniciado: "2026-11-25", total_registrados: 0, total_finalizados: 0, aciertos_pick: 0, aciertos_ml: 0, partidos: [] };
     let animTimeout = null;
     let pendingRenderCallback = null;
 
@@ -690,7 +690,6 @@
       alert("Cuotas disponibles cargadas desde el mercado.");
     }
 
-    // ================= EVALUACIÓN DE MERCADOS =================
     function evaluarTodosLosMercados(locMeta, visMeta, dep, userOdds) {
       const p1x2 = dep.simulacion_monte_carlo.probabilidades_1X2_pct;
       const pgol = dep.simulacion_monte_carlo.mercados_goles_pct;
@@ -957,7 +956,7 @@
       }
     }
 
-    // ================= AGRUPACIÓN POR FECHAS BLINDADA =================
+    // ================= AGRUPACIÓN POR FECHAS REALES =================
     function parseFechaSegura(isoStr) {
       if (!isoStr) return new Date();
       const d = new Date(isoStr);
@@ -1013,13 +1012,11 @@
         `;
       });
 
-      if (auditoriaCache.total > 0) {
-        html += `
-          <button onclick="cambiarTab('auditoria')" class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition bg-[#0b120e] border border-[#1a2921] text-slate-400 hover:text-neon hover:border-[#00FF7F]/50">
-            AUDITORÍA ${auditoriaCache.fecha_etiqueta} · ${auditoriaCache.total}
-          </button>
-        `;
-      }
+      html += `
+        <button onclick="cambiarTab('auditoria')" class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition bg-[#0b120e] border border-[#1a2921] text-slate-400 hover:text-neon hover:border-[#00FF7F]/50">
+          AUDITORÍA OFICIAL (${auditoriaCache.aciertos_pick || 0}/${auditoriaCache.total_finalizados || 0})
+        </button>
+      `;
 
       fechasDiv.innerHTML = html;
     }
@@ -1116,23 +1113,41 @@
       const headerDiv = document.getElementById("auditoriaResumenHeader");
       const gridDiv = document.getElementById("auditoriaGrid");
 
-      if (!auditoriaCache.partidos || auditoriaCache.partidos.length === 0) {
-        headerDiv.textContent = "Sin partidos auditados disponibles aún.";
+      const fin = auditoriaCache.total_finalizados || 0;
+      const reg = auditoriaCache.total_registrados || 0;
+
+      if (fin === 0) {
+        headerDiv.innerHTML = `
+          Aciertos oficiales: <span class="text-neon font-black">0/0</span>
+          <span class="text-slate-400 text-xs font-normal ml-2">(${reg} pronósticos congelados pre-juego esperando resultado final)</span>
+        `;
+      } else {
+        headerDiv.innerHTML = `
+          Pick de confianza: <span class="text-neon font-black">${auditoriaCache.aciertos_pick}/${fin} ✓</span>
+          <span class="text-slate-500 mx-2">·</span>
+          Ganador directo 1X2: <span class="text-emerald-400 font-black">${auditoriaCache.aciertos_ml}/${fin} ✓</span>
+          <span class="text-slate-400 text-xs font-normal ml-2">(${reg - fin} pendientes por jugarse)</span>
+        `;
+      }
+
+      const lista = auditoriaCache.partidos || [];
+      if (lista.length === 0) {
+        gridDiv.innerHTML = `<div class="col-span-full text-xs text-slate-400">Aún no hay partidos registrados desde el 25 Nov 2026.</div>`;
         return;
       }
 
-      headerDiv.innerHTML = `
-        Pick de confianza: <span class="text-neon font-black">${auditoriaCache.aciertos_pick}/${auditoriaCache.total} ✓</span>
-        <span class="text-slate-500 mx-2">·</span>
-        Ganador directo 1X2 (favorito del modelo): <span class="text-emerald-400 font-black">${auditoriaCache.aciertos_ml}/${auditoriaCache.total} ✓</span>
-      `;
-
-      gridDiv.innerHTML = auditoriaCache.partidos.map((p, idx) => {
+      gridDiv.innerHTML = lista.map(p => {
         const loc = getTeamMeta(p.local);
         const vis = getTeamMeta(p.visitante);
-        const elo = p.bloque_2_deportivo_y_extracancha.fuerzas_y_elo_dinamico;
-        const badgeColor = p.acerto ? "text-neon" : "text-rose-400";
-        const icon = p.acerto ? "✓" : "✗";
+        const fechaEtiqueta = formatearEtiquetaFecha(p.fecha_utc);
+        const esFinal = p.estado === "FINALIZADO";
+
+        let estadoRightHtml = `<span class="text-xs font-extrabold text-amber-300">⏳ PENDIENTE</span>`;
+        if (esFinal) {
+          estadoRightHtml = p.acerto_pick
+            ? `<span class="text-sm font-black text-neon">✓ ${p.marcador_real}</span>`
+            : `<span class="text-sm font-black text-rose-400">✗ ${p.marcador_real}</span>`;
+        }
 
         return `
           <div class="card-dark rounded-2xl p-5 flex flex-col justify-between">
@@ -1158,22 +1173,21 @@
               </div>
 
               <div class="flex items-center justify-between text-xs text-slate-400 mt-4">
-                <span>${p.fecha}</span>
-                <span>Proy ${elo.xg_proyectado_local}–${elo.xg_proyectado_visitante}</span>
+                <span>${fechaEtiqueta}</span>
+                <span>Proy xG ${p.xg_local}–${p.xg_visita}</span>
               </div>
 
               <div class="mt-3 bg-[#091a12] border border-[#00FF7F]/35 rounded-xl p-3.5">
-                <div class="text-[10px] font-extrabold uppercase tracking-wider text-neon">PICK PRE-JUEGO</div>
-                <div class="flex items-center justify-between mt-1">
-                  <span class="text-sm font-extrabold text-white">${p.pick_pre_juego}</span>
-                  <span class="text-sm font-black ${badgeColor}">${icon} ${p.marcador_real}</span>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-neon">PICK REGISTRADO (${p.prob_pick}%)</span>
+                  <span class="text-[10px] text-slate-400">${esFinal ? "FINAL" : "PRE-JUEGO"}</span>
+                </div>
+                <div class="flex items-center justify-between mt-1.5">
+                  <span class="text-sm font-extrabold text-white">${p.pick_label}</span>
+                  ${estadoRightHtml}
                 </div>
               </div>
             </div>
-
-            <button onclick="abrirModalAuditoria(${idx})" class="mt-4 w-full py-2.5 rounded-xl bg-[#070d0a] hover:bg-[#00FF7F]/15 border border-[#1f3328] hover:border-[#00FF7F] text-neon font-extrabold text-xs tracking-widest uppercase transition">
-              ANALIZAR ▸
-            </button>
           </div>
         `;
       }).join("");
@@ -1198,20 +1212,6 @@
       });
     }
 
-    function abrirModalAuditoria(idx) {
-      const p = auditoriaCache.partidos[idx];
-      if (!p) return;
-      const info = { local: p.local, visitante: p.visitante, local_modelo: p.local, visitante_modelo: p.visitante };
-      document.getElementById("modalTitulo").textContent = `AUDITORÍA PRE-JUEGO: ${p.local} vs ${p.visitante} (Marcador Real: ${p.marcador_real})`;
-      document.getElementById("modalContenido").innerHTML = renderPanelResultadosEstiloPro(
-        info,
-        p.bloque_1_mercado_cuotas,
-        p.bloque_2_deportivo_y_extracancha,
-        {}
-      );
-      document.getElementById("modalDetalle").classList.remove("hidden");
-    }
-
     function cerrarModal() {
       document.getElementById("modalDetalle").classList.add("hidden");
     }
@@ -1234,8 +1234,7 @@
       loader.classList.remove("hidden");
       loader.innerHTML = `
         <div class="inline-block w-10 h-10 border-4 border-[#00FF7F] border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando jornada y probabilidades Dixon-Coles...</p>
-        <p class="text-xs text-slate-400 mt-1">(Si el servidor estuvo inactivo, puede tardar ~25 segundos en despertar la primera vez)</p>
+        <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando fechas reales de la jornada y probabilidades Dixon-Coles...</p>
       `;
 
       try {
