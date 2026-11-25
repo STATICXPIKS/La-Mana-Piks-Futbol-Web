@@ -287,7 +287,7 @@
     <div class="max-w-7xl mx-auto px-4 pt-6">
       <div id="leagueLoader" class="text-center py-20">
         <div class="inline-block w-10 h-10 border-4 border-[#00FF7F] border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando fechas de jornada, auditoría pre-juego, cuotas, tabla y noticias...</p>
+        <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando jornada y probabilidades Dixon-Coles...</p>
       </div>
 
       <!-- ==================== PESTAÑA 1: PARTIDOS ==================== -->
@@ -1210,23 +1210,32 @@
       document.getElementById("modalDetalle").classList.add("hidden");
     }
 
+    // ================= CARGA PROGRESIVA CON TIMEOUT =================
+    async function fetchConTimeout(url, ms = 55000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), ms);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
     async function cargarTodoPremier() {
       const loader = document.getElementById("leagueLoader");
       loader.classList.remove("hidden");
+      loader.innerHTML = `
+        <div class="inline-block w-10 h-10 border-4 border-[#00FF7F] border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando jornada y probabilidades Dixon-Coles...</p>
+        <p class="text-xs text-slate-400 mt-1">(Si el servidor estuvo inactivo, puede tardar ~25 segundos en despertar la primera vez)</p>
+      `;
 
       try {
-        const [resJornada, resLiga, resAuditoria] = await Promise.all([
-          fetch(`${API_BASE}/api/premier/jornada`),
-          fetch(`${API_BASE}/api/premier/liga-info`),
-          fetch(`${API_BASE}/api/premier/auditoria`)
-        ]);
-
-        const dataJornada = await resJornada.json();
-        const dataLiga = await resLiga.json();
-        const dataAuditoria = await resAuditoria.json();
-
+        // 1. Cargar primero los partidos de la jornada para mostrar la pantalla rápido
+        const dataJornada = await fetchConTimeout(`${API_BASE}/api/premier/jornada`);
         jornadaCache = dataJornada.partidos || [];
-        auditoriaCache = dataAuditoria || { partidos: [] };
 
         partidosPorFecha = {};
         jornadaCache.forEach((m, idx) => {
@@ -1240,6 +1249,18 @@
           seleccionarFecha(fechasOrdenadas[0]);
         }
 
+        // Mostrar ya los partidos sin hacer esperar al usuario
+        loader.classList.add("hidden");
+        cambiarTab("partidos");
+
+        // 2. Cargar Auditoría y Liga-Info en segundo plano (el servidor ya está despierto y con caché)
+        const [dataLiga, dataAuditoria] = await Promise.all([
+          fetchConTimeout(`${API_BASE}/api/premier/liga-info`, 30000).catch(() => ({ tabla_posiciones: [], noticias_liga: [] })),
+          fetchConTimeout(`${API_BASE}/api/premier/auditoria`, 30000).catch(() => ({ partidos: [] }))
+        ]);
+
+        auditoriaCache = dataAuditoria || { partidos: [] };
+        renderizarPillsFechas();
         renderizarAuditoria();
 
         const newsDiv = document.getElementById("noticiasListContainer");
@@ -1285,10 +1306,15 @@
           </tr>
         `).join("");
 
-        loader.classList.add("hidden");
-        cambiarTab("partidos");
       } catch (err) {
-        loader.innerHTML = `<div class="text-rose-400 text-sm">Error sincronizando datos: ${err.message}</div>`;
+        loader.innerHTML = `
+          <div class="max-w-md mx-auto bg-[#0b120e] border border-rose-500/40 rounded-2xl p-6 space-y-3">
+            <div class="text-rose-400 text-sm font-bold">El servidor tardó demasiado en responder (${err.message}).</div>
+            <button onclick="cargarTodoPremier()" class="px-5 py-2 rounded-full bg-neon text-slate-950 font-black text-xs uppercase tracking-wider">
+              Reintentar ahora ↻
+            </button>
+          </div>
+        `;
       }
     }
   </script>
