@@ -11,25 +11,106 @@
     .cyan-glow { box-shadow: 0 0 18px rgba(6, 182, 212, 0.45); }
     .card-dark { background: linear-gradient(180deg, #0b1120 0%, #070b14 100%); border: 1px solid #1e293b; }
     .card-dark:hover { border-color: rgba(6, 182, 212, 0.55); }
+    .pin-btn {
+      width: 68px;
+      height: 68px;
+      border-radius: 9999px;
+      background-color: #131824;
+      border: 1px solid #1f2737;
+      color: #f8fafc;
+      font-size: 1.5rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .pin-btn:hover {
+      background-color: #1c2436;
+      border-color: rgba(34, 211, 238, 0.5);
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.25);
+    }
+    .pin-btn:active {
+      transform: scale(0.93);
+      background-color: #22d3ee;
+      color: #050811;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake { animation: shake 0.35s ease-in-out; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen transition-colors duration-300" id="appBody">
+<body class="bg-slate-50 text-slate-900 min-h-screen overflow-hidden" id="appBody">
 
-  <!-- ==================== VISTA 1: HUB PRINCIPAL DE LIGAS (ESTILO IMAGEN 5) ==================== -->
+  <!-- ==================== PANTALLA DE ACCESO PIN (7766) ==================== -->
+  <div id="lockScreen" class="fixed inset-0 z-[100] bg-[#060911] flex flex-col items-center justify-center p-6">
+    <div class="text-center mb-6">
+      <div class="text-xs font-extrabold uppercase tracking-[0.28em] text-slate-300">
+        LA MAÑA <span class="text-cyan-400">PICKS</span>
+      </div>
+      <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-slate-400 mt-3">
+        INGRESA CÓDIGO DE ACCESO
+      </h2>
+
+      <!-- 4 Círculos Indicadores Cian -->
+      <div id="pinDotsContainer" class="flex items-center justify-center gap-4 mt-5">
+        <span id="dot-0" class="w-3.5 h-3.5 rounded-full border-2 border-cyan-400 transition-all duration-150"></span>
+        <span id="dot-1" class="w-3.5 h-3.5 rounded-full border-2 border-cyan-400 transition-all duration-150"></span>
+        <span id="dot-2" class="w-3.5 h-3.5 rounded-full border-2 border-cyan-400 transition-all duration-150"></span>
+        <span id="dot-3" class="w-3.5 h-3.5 rounded-full border-2 border-cyan-400 transition-all duration-150"></span>
+      </div>
+
+      <p id="pinErrorText" class="h-4 text-[11px] font-bold tracking-wider uppercase text-rose-400 mt-3 opacity-0 transition-opacity">
+        CÓDIGO INCORRECTO
+      </p>
+    </div>
+
+    <!-- Teclado Numérico Circular -->
+    <div class="grid grid-cols-3 gap-4 sm:gap-5">
+      <button type="button" onclick="presionarDigito('1')" class="pin-btn">1</button>
+      <button type="button" onclick="presionarDigito('2')" class="pin-btn">2</button>
+      <button type="button" onclick="presionarDigito('3')" class="pin-btn">3</button>
+
+      <button type="button" onclick="presionarDigito('4')" class="pin-btn">4</button>
+      <button type="button" onclick="presionarDigito('5')" class="pin-btn">5</button>
+      <button type="button" onclick="presionarDigito('6')" class="pin-btn">6</button>
+
+      <button type="button" onclick="presionarDigito('7')" class="pin-btn">7</button>
+      <button type="button" onclick="presionarDigito('8')" class="pin-btn">8</button>
+      <button type="button" onclick="presionarDigito('9')" class="pin-btn">9</button>
+
+      <div></div>
+      <button type="button" onclick="presionarDigito('0')" class="pin-btn">0</button>
+      <button type="button" onclick="borrarDigito()" class="pin-btn" aria-label="Borrar">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== VISTA 1: HUB PRINCIPAL DE LIGAS ==================== -->
   <div id="viewHub" class="min-h-screen flex flex-col">
-    <!-- Navbar Blanco Superior -->
     <nav class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
         <span class="text-2xl font-black tracking-tight text-slate-900">LA MAÑA <span class="text-emerald-500">PICKS</span></span>
         <span class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">FÚTBOL</span>
       </div>
-      <div class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold tracking-wider flex items-center gap-2 shadow-sm">
-        <span class="text-slate-400">MODELO:</span>
-        <span class="text-emerald-400">DIXON-COLES + MC 25K</span>
+      <div class="flex items-center gap-2">
+        <div class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold tracking-wider hidden sm:flex items-center gap-2 shadow-sm">
+          <span class="text-slate-400">MODELO:</span>
+          <span class="text-emerald-400">DIXON-COLES + MC 25K</span>
+        </div>
+        <button onclick="bloquearPantalla()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-300 transition">
+          🔒 Bloquear
+        </button>
       </div>
     </nav>
 
-    <!-- Hero Hub Central -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
       <div class="text-center max-w-2xl mx-auto mb-12">
         <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">
@@ -40,10 +121,8 @@
         </p>
       </div>
 
-      <!-- Grid de Tarjetas de Ligas -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        <!-- TARJETA ACTIVA: PREMIER LEAGUE -->
+        <!-- PREMIER LEAGUE -->
         <div class="bg-white rounded-3xl border-2 border-emerald-500 p-6 shadow-lg flex flex-col justify-between transition hover:-translate-y-1">
           <div>
             <div class="flex justify-center">
@@ -54,7 +133,6 @@
             <h2 class="text-center text-xl font-black text-slate-900 mt-3">PREMIER-IA</h2>
             <p class="text-center text-xs text-slate-400 mt-0.5">Dixon-Coles, xG, Elo y Cuotas EV+</p>
 
-            <!-- Escudo / Visual Central -->
             <div class="my-6 flex flex-col items-center justify-center">
               <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 flex items-center justify-center p-3">
                 <img src="https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" alt="Premier League" class="w-16 h-16 object-contain" />
@@ -77,7 +155,7 @@
           </button>
         </div>
 
-        <!-- TARJETA PRÓXIMAMENTE 1: CHAMPIONS LEAGUE -->
+        <!-- CHAMPIONS LEAGUE -->
         <div class="bg-white rounded-3xl border-2 border-sky-400/60 p-6 shadow-sm flex flex-col justify-between opacity-75">
           <div>
             <div class="flex justify-center">
@@ -99,7 +177,7 @@
           </button>
         </div>
 
-        <!-- TARJETA PRÓXIMAMENTE 2: LALIGA -->
+        <!-- LALIGA -->
         <div class="bg-white rounded-3xl border-2 border-orange-400/60 p-6 shadow-sm flex flex-col justify-between opacity-75">
           <div>
             <div class="flex justify-center">
@@ -121,7 +199,7 @@
           </button>
         </div>
 
-        <!-- TARJETA PRÓXIMAMENTE 3: LIGA MX -->
+        <!-- LIGA MX -->
         <div class="bg-white rounded-3xl border-2 border-amber-400/60 p-6 shadow-sm flex flex-col justify-between opacity-75">
           <div>
             <div class="flex justify-center">
@@ -142,15 +220,12 @@
             PRÓXIMAMENTE 🇲🇽
           </button>
         </div>
-
       </div>
     </main>
   </div>
 
-  <!-- ==================== VISTA 2: DASHBOARD INTERNO PREMIER LEAGUE (ESTILO IMÁGENES 1, 2, 3, 4 Y 6) ==================== -->
+  <!-- ==================== VISTA 2: DASHBOARD INTERNO PREMIER LEAGUE ==================== -->
   <div id="viewLeague" class="hidden min-h-screen bg-[#050811] text-slate-100 pb-16">
-    
-    <!-- Barra Superior -->
     <div class="border-b border-slate-800/80 bg-[#070b14]/90 backdrop-blur sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
@@ -163,7 +238,6 @@
           </div>
         </div>
 
-        <!-- Menú Pill de 4 Pestañas (Estilo exacto Imagen 1-4) -->
         <div class="inline-flex items-center bg-[#0b1120] border border-slate-800 rounded-full p-1 gap-1">
           <button onclick="cambiarTab('partidos')" id="tabBtn-partidos" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition bg-cyan-400 text-slate-950 cyan-glow">
             PARTIDOS
@@ -182,19 +256,15 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 pt-6">
-      
-      <!-- Loader -->
       <div id="leagueLoader" class="text-center py-20">
         <div class="inline-block w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mb-3"></div>
         <p class="text-cyan-300 text-sm font-semibold tracking-wide">Sincronizando datos reales de Premier League (Dixon-Coles, Cuotas, Tabla y RSS)...</p>
       </div>
 
-      <!-- ==================== PESTAÑA 1: PARTIDOS (ESTILO IMAGEN 1) ==================== -->
+      <!-- PESTAÑA 1: PARTIDOS -->
       <div id="tab-partidos" class="hidden space-y-6">
-        <!-- Pills de Fechas -->
         <div id="fechasPills" class="flex flex-wrap items-center gap-2"></div>
 
-        <!-- Ranking del Día · Mejores Picks -->
         <div class="card-dark rounded-2xl p-5">
           <div class="text-xs font-extrabold uppercase tracking-widest text-cyan-400 mb-4">
             RANKING DEL DÍA · MEJORES PICKS (ANÁLISIS DEPORTIVO PURO)
@@ -202,13 +272,11 @@
           <div id="rankingDiaList" class="divide-y divide-slate-800/70"></div>
         </div>
 
-        <!-- Grid de Tarjetas de Partidos -->
         <div id="partidosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </div>
 
-      <!-- ==================== PESTAÑA 2: SIMULADOR (ESTILO IMÁGENES 2 Y 6) ==================== -->
+      <!-- PESTAÑA 2: SIMULADOR -->
       <div id="tab-simulador" class="hidden space-y-6">
-        <!-- Selectores Local y Visitante -->
         <div class="card-dark rounded-2xl p-5">
           <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
             <div class="md:col-span-5">
@@ -222,7 +290,6 @@
             </div>
           </div>
 
-          <!-- Banner Oscuro con Escudos Reales Enfrentados (Estilo Imagen 6) -->
           <div class="mt-5 bg-[#03050a] border border-slate-800/90 rounded-2xl py-7 px-4 flex flex-col sm:flex-row items-center justify-around gap-6">
             <div class="flex flex-col items-center text-center">
               <img id="simEscudoLocal" src="" alt="Local" class="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.35)]" />
@@ -243,11 +310,10 @@
           </div>
         </div>
 
-        <!-- Resultado de Simulación -->
         <div id="simResultadoContainer"></div>
       </div>
 
-      <!-- ==================== PESTAÑA 3: NOTICIAS Y BAJAS (ESTILO IMAGEN 3) ==================== -->
+      <!-- PESTAÑA 3: NOTICIAS -->
       <div id="tab-noticias" class="hidden">
         <div class="card-dark rounded-2xl p-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-800">
@@ -260,7 +326,7 @@
         </div>
       </div>
 
-      <!-- ==================== PESTAÑA 4: EQUIPOS / TABLA (ESTILO IMAGEN 4) ==================== -->
+      <!-- PESTAÑA 4: EQUIPOS -->
       <div id="tab-equipos" class="hidden">
         <div class="card-dark rounded-2xl overflow-hidden">
           <div class="overflow-x-auto">
@@ -284,11 +350,10 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ==================== MODAL DETALLE COMPLETO (LOS 2 ANÁLISIS SEPARADOS) ==================== -->
+  <!-- MODAL DETALLE -->
   <div id="modalDetalle" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-[#090e1a] border border-cyan-500/40 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
@@ -302,7 +367,71 @@
   <script>
     const API_BASE = "https://la-mana-piks-futbol.onrender.com";
 
-    // Diccionario de escudos reales oficiales (ESPN CDN) de los 20 equipos actuales
+    // ================= TECLADO PIN (7766) SIN PERSISTENCIA =================
+    const PIN_CORRECTO = "7766"; // <-- Cambia aquí el PIN cuando quieras
+    let pinActual = "";
+
+    function actualizarCirculosPin() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i < pinActual.length) {
+          dot.classList.add("bg-cyan-400", "cyan-glow");
+        } else {
+          dot.classList.remove("bg-cyan-400", "cyan-glow");
+        }
+      }
+    }
+
+    function presionarDigito(num) {
+      if (pinActual.length >= 4) return;
+      document.getElementById("pinErrorText").classList.add("opacity-0");
+      pinActual += num;
+      actualizarCirculosPin();
+
+      if (pinActual.length === 4) {
+        if (pinActual === PIN_CORRECTO) {
+          setTimeout(() => {
+            document.getElementById("lockScreen").classList.add("hidden");
+            document.getElementById("appBody").classList.remove("overflow-hidden");
+            pinActual = "";
+            actualizarCirculosPin();
+          }, 150);
+        } else {
+          const dots = document.getElementById("pinDotsContainer");
+          const err = document.getElementById("pinErrorText");
+          dots.classList.add("animate-shake");
+          err.classList.remove("opacity-0");
+          setTimeout(() => {
+            dots.classList.remove("animate-shake");
+            pinActual = "";
+            actualizarCirculosPin();
+          }, 420);
+        }
+      }
+    }
+
+    function borrarDigito() {
+      if (pinActual.length > 0) {
+        pinActual = pinActual.slice(0, -1);
+        actualizarCirculosPin();
+      }
+    }
+
+    function bloquearPantalla() {
+      pinActual = "";
+      actualizarCirculosPin();
+      document.getElementById("lockScreen").classList.remove("hidden");
+      document.getElementById("appBody").classList.add("overflow-hidden");
+    }
+
+    // Permitir también teclear los números con el teclado físico
+    document.addEventListener("keydown", (e) => {
+      if (document.getElementById("lockScreen").classList.contains("hidden")) return;
+      if (e.key >= "0" && e.key <= "9") presionarDigito(e.key);
+      if (e.key === "Backspace") borrarDigito();
+    });
+
+    // ================= DICCIONARIO DE ESCUDOS Y LÓGICA APP =================
     const ESCUDOS_PL = {
       "Arsenal": { nombre: "Arsenal", abbr: "ARS", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/359.png" },
       "Aston Villa": { nombre: "Aston Villa", abbr: "AVL", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/362.png" },
@@ -411,7 +540,6 @@
       return `
         <div class="card-dark rounded-2xl p-5 flex flex-col justify-between transition">
           <div>
-            <!-- Encabezado con Escudos y Abreviaturas (Estilo Imagen 1) -->
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5">
                 <img src="${loc.logo}" alt="${loc.abbr}" class="w-9 h-9 object-contain" />
@@ -432,13 +560,11 @@
               </div>
             </div>
 
-            <!-- Hora y Proyección xG -->
             <div class="flex items-center justify-between text-xs text-slate-400 mt-4">
               <span>${hora}</span>
               <span>Proy xG <strong class="text-slate-200">${elo.xg_proyectado_local}–${elo.xg_proyectado_visitante}</strong></span>
             </div>
 
-            <!-- Caja Pick Principal -->
             <div class="mt-3 bg-cyan-950/30 border border-cyan-500/40 rounded-xl p-3.5">
               <div class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">PICK DEPORTIVO</div>
               <div class="flex items-center justify-between mt-1">
@@ -511,7 +637,6 @@
 
       return `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- BLOQUE 1: MERCADO -->
           <div class="lg:col-span-5 bg-[#060913] border border-slate-800 rounded-2xl p-5 space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400">1. ANÁLISIS DEL MERCADO (CUOTAS)</span>
@@ -524,7 +649,6 @@
             </div>
           </div>
 
-          <!-- BLOQUE 2: DEPORTIVO Y EXTRA-CANCHA -->
           <div class="lg:col-span-7 bg-[#060913] border border-slate-800 rounded-2xl p-5 space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-400">2. ANÁLISIS DEPORTIVO Y EXTRA-CANCHA</span>
@@ -573,7 +697,6 @@
               <div class="flex flex-wrap gap-1.5">${marcadoresHtml}</div>
             </div>
 
-            <!-- Tabla y Presión -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-900/60 p-3 rounded-xl border border-slate-800">
               <div>
                 <span class="text-slate-400">Posición Local:</span> <strong class="text-white">#${tabla.local?.posicion_actual || "-"} (${tabla.local?.puntos || 0} pts)</strong>
@@ -585,7 +708,6 @@
               </div>
             </div>
 
-            <!-- Estadísticas Últimos 10 y Temporada -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-900/60 p-3 rounded-xl border border-slate-800">
               <div class="space-y-1">
                 <div class="font-bold text-cyan-400">Local · Forma y Tiros</div>
@@ -603,7 +725,6 @@
               </div>
             </div>
 
-            <!-- Táctica y Extra-Cancha -->
             <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1">
               <div class="font-bold text-cyan-400">Neutralización Táctica (Índice: ${tact?.indice_neutralizacion_mutua || 0})</div>
               <div><strong>Local:</strong> ${tact?.perfil_tactico_local?.estilo_detectado || "-"}</div>
@@ -675,7 +796,6 @@
         jornadaCache = dataJornada.partidos || [];
         ligaInfoCache = dataLiga;
 
-        // 1. Renderizar Pestaña Partidos
         const fechasDiv = document.getElementById("fechasPills");
         const rankDiv = document.getElementById("rankingDiaList");
         const gridDiv = document.getElementById("partidosGrid");
@@ -706,7 +826,6 @@
 
         gridDiv.innerHTML = jornadaCache.map((m, i) => renderCardPartidoCompacta(m, i)).join("");
 
-        // 2. Renderizar Pestaña Noticias (Estilo Imagen 3)
         const newsDiv = document.getElementById("noticiasListContainer");
         const allNews = dataLiga.noticias_liga || [];
         newsDiv.innerHTML = allNews.map(n => `
@@ -726,7 +845,6 @@
           </div>
         `).join("") || `<div class="text-xs text-slate-500 py-4">Sin noticias recientes disponibles.</div>`;
 
-        // 3. Renderizar Pestaña Equipos / Tabla (Estilo Imagen 4)
         const tbody = document.getElementById("tablaEquiposBody");
         const tabla = dataLiga.tabla_posiciones || [];
         tbody.innerHTML = tabla.map(t => `
