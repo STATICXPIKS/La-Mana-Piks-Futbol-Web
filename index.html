@@ -140,7 +140,7 @@
               </span>
             </div>
             <h2 class="text-center text-xl font-black text-slate-900 mt-3">PREMIER-IA</h2>
-            <p class="text-center text-xs text-slate-400 mt-0.5">Dixon-Coles, xG, Elo y Cuotas EV+</p>
+            <p class="text-center text-xs text-slate-400 mt-0.5">Dixon-Coles, xG, Elo y Auditoría</p>
 
             <div class="my-6 flex flex-col items-center justify-center">
               <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 flex items-center justify-center p-3">
@@ -247,17 +247,21 @@
           </div>
         </div>
 
-        <div class="inline-flex items-center bg-[#0b1120] border border-slate-800 rounded-full p-1 gap-1">
-          <button onclick="cambiarTab('partidos')" id="tabBtn-partidos" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition bg-cyan-400 text-slate-950 cyan-glow">
+        <!-- Menú Pill Superior de 5 Pestañas -->
+        <div class="inline-flex flex-wrap items-center bg-[#0b1120] border border-slate-800 rounded-full p-1 gap-1">
+          <button onclick="cambiarTab('partidos')" id="tabBtn-partidos" class="px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition bg-cyan-400 text-slate-950 cyan-glow">
             PARTIDOS
           </button>
-          <button onclick="cambiarTab('simulador')" id="tabBtn-simulador" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
+          <button onclick="cambiarTab('simulador')" id="tabBtn-simulador" class="px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
             SIMULADOR
           </button>
-          <button onclick="cambiarTab('noticias')" id="tabBtn-noticias" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
+          <button onclick="cambiarTab('auditoria')" id="tabBtn-auditoria" class="px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
+            AUDITORÍA
+          </button>
+          <button onclick="cambiarTab('noticias')" id="tabBtn-noticias" class="px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
             NOTICIAS
           </button>
-          <button onclick="cambiarTab('equipos')" id="tabBtn-equipos" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
+          <button onclick="cambiarTab('equipos')" id="tabBtn-equipos" class="px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white">
             EQUIPOS
           </button>
         </div>
@@ -267,13 +271,15 @@
     <div class="max-w-7xl mx-auto px-4 pt-6">
       <div id="leagueLoader" class="text-center py-20">
         <div class="inline-block w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p class="text-cyan-300 text-sm font-semibold tracking-wide">Sincronizando datos reales de Premier League (Dixon-Coles, Cuotas, Tabla y RSS)...</p>
+        <p class="text-cyan-300 text-sm font-semibold tracking-wide">Sincronizando fechas de jornada, auditoría pre-juego, cuotas, tabla y noticias...</p>
       </div>
 
-      <!-- PESTAÑA 1: PARTIDOS -->
+      <!-- ==================== PESTAÑA 1: PARTIDOS (CON BOTONES DE FECHA POR DÍA) ==================== -->
       <div id="tab-partidos" class="hidden space-y-6">
-        <div id="fechasPills" class="flex flex-wrap items-center gap-2"></div>
+        <!-- Pills de Fechas de la Jornada + Acceso Directo Auditoría -->
+        <div id="fechasPills" class="flex flex-wrap items-center gap-2.5"></div>
 
+        <!-- Ranking del Día -->
         <div class="card-dark rounded-2xl p-5">
           <div class="text-xs font-extrabold uppercase tracking-widest text-cyan-400 mb-4">
             RANKING DEL DÍA · MEJORES PICKS (ANÁLISIS DEPORTIVO PURO)
@@ -281,10 +287,11 @@
           <div id="rankingDiaList" class="divide-y divide-slate-800/70"></div>
         </div>
 
+        <!-- Tarjetas de Partidos de la Fecha Seleccionada -->
         <div id="partidosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </div>
 
-      <!-- PESTAÑA 2: SIMULADOR -->
+      <!-- ==================== PESTAÑA 2: SIMULADOR ==================== -->
       <div id="tab-simulador" class="hidden space-y-6">
         <div class="card-dark rounded-2xl p-5 space-y-5">
           <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
@@ -388,7 +395,24 @@
         <div id="simResultadoContainer"></div>
       </div>
 
-      <!-- PESTAÑA 3: NOTICIAS -->
+      <!-- ==================== PESTAÑA 3: AUDITORÍA (ESTILO IMAGEN 3) ==================== -->
+      <div id="tab-auditoria" class="hidden space-y-6">
+        <div class="card-dark rounded-2xl p-5">
+          <div class="text-xs font-extrabold uppercase tracking-widest text-cyan-400">
+            AUDITORÍA · QUÉ HABRÍA DICHO EL MODELO ANTES DE LOS JUEGOS
+          </div>
+          <div id="auditoriaResumenHeader" class="text-sm font-bold text-white mt-2">
+            Calculando retrospectiva pre-juego...
+          </div>
+          <p class="text-xs text-slate-400 mt-1">
+            Calculado exclusivamente con datos previos a la jornada (sin conocer los resultados futuros). Toca ANALIZAR en cualquier partido para ver el desglose completo.
+          </p>
+        </div>
+
+        <div id="auditoriaGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      </div>
+
+      <!-- ==================== PESTAÑA 4: NOTICIAS ==================== -->
       <div id="tab-noticias" class="hidden">
         <div class="card-dark rounded-2xl p-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-800">
@@ -401,7 +425,7 @@
         </div>
       </div>
 
-      <!-- PESTAÑA 4: EQUIPOS -->
+      <!-- ==================== PESTAÑA 5: EQUIPOS ==================== -->
       <div id="tab-equipos" class="hidden">
         <div class="card-dark rounded-2xl overflow-hidden">
           <div class="overflow-x-auto">
@@ -464,7 +488,7 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL DETALLE PARTIDO DE JORNADA ==================== -->
+  <!-- ==================== MODAL DETALLE PARTIDO ==================== -->
   <div id="modalDetalle" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-[#090e1a] border border-cyan-500/40 rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
@@ -566,6 +590,10 @@
     };
 
     let jornadaCache = [];
+    let partidosPorFecha = {};
+    let fechasOrdenadas = [];
+    let fechaSeleccionada = "";
+    let auditoriaCache = { fecha_etiqueta: "", total: 0, aciertos_pick: 0, aciertos_ml: 0, partidos: [] };
     let animTimeout = null;
     let pendingRenderCallback = null;
 
@@ -596,14 +624,14 @@
     }
 
     function cambiarTab(tabName) {
-      ["partidos", "simulador", "noticias", "equipos"].forEach(t => {
+      ["partidos", "simulador", "auditoria", "noticias", "equipos"].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add("hidden");
         const btn = document.getElementById(`tabBtn-${t}`);
-        btn.className = "px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white";
+        btn.className = "px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition text-slate-400 hover:text-white";
       });
       document.getElementById(`tab-${tabName}`).classList.remove("hidden");
       const activeBtn = document.getElementById(`tabBtn-${tabName}`);
-      activeBtn.className = "px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition bg-cyan-400 text-slate-950 cyan-glow";
+      activeBtn.className = "px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition bg-cyan-400 text-slate-950 cyan-glow";
     }
 
     function inicializarSelectoresSimulador() {
@@ -646,7 +674,7 @@
       alert("Cuotas disponibles cargadas desde el mercado.");
     }
 
-    // ================= EVALUACIÓN DE MERCADOS CON TUS REGLAS EXACTAS =================
+    // ================= EVALUACIÓN DE MERCADOS (TUS REGLAS EXACTAS) =================
     function evaluarTodosLosMercados(locMeta, visMeta, dep, userOdds) {
       const p1x2 = dep.simulacion_monte_carlo.probabilidades_1X2_pct;
       const pgol = dep.simulacion_monte_carlo.mercados_goles_pct;
@@ -673,10 +701,6 @@
         m.cuotaJusta = m.prob > 0 ? (100.0 / m.prob).toFixed(2) : "-";
         if (m.cuotaUser > 1.0) {
           m.evPct = Number((((m.prob / 100.0) * m.cuotaUser - 1.0) * 100.0).toFixed(1));
-          // Reglas solicitadas:
-          // ELITE BET: EV >= +4.0% y Probabilidad >= 62.0%
-          // VALUE BET: EV >= +2.0% y Probabilidad >= 50.0%
-          // NO BET / PASAR: EV < +2.0% o Probabilidad < 50.0%
           if (m.evPct >= 4.0 && m.prob >= 62.0) {
             m.badge = { texto: `ELITE BET 💎 (+${m.evPct}% EV)`, clase: "bg-emerald-500 text-slate-950 font-black" };
           } else if (m.evPct >= 2.0 && m.prob >= 50.0) {
@@ -917,6 +941,22 @@
       }
     }
 
+    // ================= AGRUPACIÓN POR FECHAS Y RENDER DE JORNADA =================
+    function formatearEtiquetaFecha(isoStr) {
+      const d = new Date(isoStr);
+      const dias = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
+      const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+      const diaSem = dias[d.getDay()];
+      const numDia = d.getDate();
+      const mes = meses[d.getMonth()];
+      return `${diaSem} ${numDia} ${mes}`;
+    }
+
+    function obtenerClaveFecha(isoStr) {
+      const d = new Date(isoStr);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
     function obtenerMejorPickDeportivo(deportivo, locAbbr, visAbbr) {
       const probs = deportivo.simulacion_monte_carlo.probabilidades_1X2_pct;
       const goles = deportivo.simulacion_monte_carlo.mercados_goles_pct;
@@ -930,6 +970,70 @@
       ];
       candidatos.sort((a, b) => b.prob - a.prob);
       return candidatos[0];
+    }
+
+    function renderizarPillsFechas() {
+      const fechasDiv = document.getElementById("fechasPills");
+      let html = "";
+
+      fechasOrdenadas.forEach((fKey, idx) => {
+        const lista = partidosPorFecha[fKey] || [];
+        const etiqueta = formatearEtiquetaFecha(lista[0].partido_info.fecha_utc);
+        const prefijo = idx === 0 ? "PRÓX · " : "";
+        const activo = fKey === fechaSeleccionada;
+
+        html += `
+          <button onclick="seleccionarFecha('${fKey}')" class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition ${
+            activo
+              ? "bg-cyan-400 text-slate-950 cyan-glow"
+              : "bg-[#0b1120] border border-slate-800 text-slate-400 hover:text-white hover:border-slate-600"
+          }">
+            ${prefijo}${etiqueta} · ${lista.length}
+          </button>
+        `;
+      });
+
+      // Botón rápido hacia Auditoría (Estilo Imagen 1-3)
+      if (auditoriaCache.total > 0) {
+        html += `
+          <button onclick="cambiarTab('auditoria')" class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition bg-[#0b1120] border border-slate-800 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50">
+            AUDITORÍA ${auditoriaCache.fecha_etiqueta} · ${auditoriaCache.total}
+          </button>
+        `;
+      }
+
+      fechasDiv.innerHTML = html;
+    }
+
+    function seleccionarFecha(fKey) {
+      fechaSeleccionada = fKey;
+      renderizarPillsFechas();
+
+      const listaDia = partidosPorFecha[fKey] || [];
+      const rankDiv = document.getElementById("rankingDiaList");
+      const gridDiv = document.getElementById("partidosGrid");
+
+      rankDiv.innerHTML = listaDia.map(item => {
+        const m = item.match;
+        const globalIdx = item.globalIdx;
+        const loc = getTeamMeta(m.partido_info.local_modelo);
+        const vis = getTeamMeta(m.partido_info.visitante_modelo);
+        const pick = obtenerMejorPickDeportivo(m.bloque_2_deportivo_y_extracancha, loc.abbr, vis.abbr);
+        return `
+          <div onclick="abrirModalDetalle(${globalIdx})" class="py-3 flex items-center justify-between cursor-pointer hover:bg-slate-800/30 px-2 rounded-lg transition">
+            <div>
+              <div class="text-sm font-extrabold text-white">${loc.abbr} vs ${vis.abbr}</div>
+              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${pick.desc}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-extrabold text-white">${pick.label}</div>
+              <div class="text-xs font-bold text-cyan-400">${pick.prob}%</div>
+            </div>
+          </div>
+        `;
+      }).join("") || `<div class="text-xs text-slate-500 py-2">Sin partidos para esta fecha.</div>`;
+
+      gridDiv.innerHTML = listaDia.map(item => renderCardPartidoCompacta(item.match, item.globalIdx)).join("");
     }
 
     function renderCardPartidoCompacta(matchObj, index) {
@@ -973,7 +1077,7 @@
             </div>
 
             <div class="mt-3 bg-cyan-950/30 border border-cyan-500/40 rounded-xl p-3.5">
-              <div class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">OPCIÓN MÁS SEGURA</div>
+              <div class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">PICK</div>
               <div class="flex items-center justify-between mt-1">
                 <span class="text-sm font-extrabold text-white">${bestPick.label}</span>
                 <span class="text-base font-black text-white">${bestPick.prob}%</span>
@@ -986,6 +1090,73 @@
           </button>
         </div>
       `;
+    }
+
+    function renderizarAuditoria() {
+      const headerDiv = document.getElementById("auditoriaResumenHeader");
+      const gridDiv = document.getElementById("auditoriaGrid");
+
+      if (!auditoriaCache.partidos || auditoriaCache.partidos.length === 0) {
+        headerDiv.textContent = "Sin partidos auditados disponibles aún.";
+        return;
+      }
+
+      headerDiv.innerHTML = `
+        Pick de confianza: <span class="text-emerald-400 font-black">${auditoriaCache.aciertos_pick}/${auditoriaCache.total} ✓</span>
+        <span class="text-slate-500 mx-2">·</span>
+        Ganador directo 1X2 (favorito del modelo): <span class="text-cyan-400 font-black">${auditoriaCache.aciertos_ml}/${auditoriaCache.total} ✓</span>
+      `;
+
+      gridDiv.innerHTML = auditoriaCache.partidos.map((p, idx) => {
+        const loc = getTeamMeta(p.local);
+        const vis = getTeamMeta(p.visitante);
+        const elo = p.bloque_2_deportivo_y_extracancha.fuerzas_y_elo_dinamico;
+        const badgeColor = p.acerto ? "text-emerald-400" : "text-rose-400";
+        const icon = p.acerto ? "✓" : "✗";
+
+        return `
+          <div class="card-dark rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <img src="${loc.logo}" class="w-8 h-8 object-contain" />
+                  <div>
+                    <div class="text-lg font-black text-white leading-none">${loc.abbr}</div>
+                    <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">LOCAL</div>
+                  </div>
+                </div>
+
+                <div class="w-3 h-3 rounded-full bg-cyan-400/20 border border-cyan-400 cyan-glow"></div>
+
+                <div class="flex items-center gap-2.5 text-right">
+                  <div>
+                    <div class="text-lg font-black text-white leading-none">${vis.abbr}</div>
+                    <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">VISITA</div>
+                  </div>
+                  <img src="${vis.logo}" class="w-8 h-8 object-contain" />
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs text-slate-400 mt-4">
+                <span>${p.fecha}</span>
+                <span>Proy ${elo.xg_proyectado_local}–${elo.xg_proyectado_visitante}</span>
+              </div>
+
+              <div class="mt-3 bg-cyan-950/30 border border-cyan-500/30 rounded-xl p-3.5">
+                <div class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">PICK PRE-JUEGO</div>
+                <div class="flex items-center justify-between mt-1">
+                  <span class="text-sm font-extrabold text-white">${p.pick_pre_juego}</span>
+                  <span class="text-sm font-black ${badgeColor}">${icon} ${p.marcador_real}</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="abrirModalAuditoria(${idx})" class="mt-4 w-full py-2.5 rounded-xl bg-[#070b14] hover:bg-cyan-400/10 border border-slate-700 hover:border-cyan-400 text-cyan-400 font-extrabold text-xs tracking-widest uppercase transition">
+              ANALIZAR ▸
+            </button>
+          </div>
+        `;
+      }).join("");
     }
 
     function abrirModalDetalle(index) {
@@ -1007,6 +1178,20 @@
       });
     }
 
+    function abrirModalAuditoria(idx) {
+      const p = auditoriaCache.partidos[idx];
+      if (!p) return;
+      const info = { local: p.local, visitante: p.visitante, local_modelo: p.local, visitante_modelo: p.visitante };
+      document.getElementById("modalTitulo").textContent = `AUDITORÍA PRE-JUEGO: ${p.local} vs ${p.visitante} (Marcador Real: ${p.marcador_real})`;
+      document.getElementById("modalContenido").innerHTML = renderPanelResultadosEstiloPro(
+        info,
+        p.bloque_1_mercado_cuotas,
+        p.bloque_2_deportivo_y_extracancha,
+        {}
+      );
+      document.getElementById("modalDetalle").classList.remove("hidden");
+    }
+
     function cerrarModal() {
       document.getElementById("modalDetalle").classList.add("hidden");
     }
@@ -1016,45 +1201,35 @@
       loader.classList.remove("hidden");
 
       try {
-        const [resJornada, resLiga] = await Promise.all([
+        const [resJornada, resLiga, resAuditoria] = await Promise.all([
           fetch(`${API_BASE}/api/premier/jornada`),
-          fetch(`${API_BASE}/api/premier/liga-info`)
+          fetch(`${API_BASE}/api/premier/liga-info`),
+          fetch(`${API_BASE}/api/premier/auditoria`)
         ]);
 
         const dataJornada = await resJornada.json();
         const dataLiga = await resLiga.json();
+        const dataAuditoria = await resAuditoria.json();
+
         jornadaCache = dataJornada.partidos || [];
+        auditoriaCache = dataAuditoria || { partidos: [] };
 
-        const fechasDiv = document.getElementById("fechasPills");
-        const rankDiv = document.getElementById("rankingDiaList");
-        const gridDiv = document.getElementById("partidosGrid");
+        // Agrupar partidos por fecha
+        partidosPorFecha = {};
+        jornadaCache.forEach((m, idx) => {
+          const fKey = obtenerClaveFecha(m.partido_info.fecha_utc);
+          if (!partidosPorFecha[fKey]) partidosPorFecha[fKey] = [];
+          partidosPorFecha[fKey].push({ match: m, globalIdx: idx });
+        });
+        fechasOrdenadas = Object.keys(partidosPorFecha).sort();
 
-        fechasDiv.innerHTML = `
-          <span class="px-4 py-1.5 rounded-full bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider cyan-glow">
-            PRÓXIMA JORNADA · ${jornadaCache.length} PARTIDOS
-          </span>
-        `;
+        if (fechasOrdenadas.length > 0) {
+          seleccionarFecha(fechasOrdenadas[0]);
+        }
 
-        rankDiv.innerHTML = jornadaCache.map((m, i) => {
-          const loc = getTeamMeta(m.partido_info.local_modelo);
-          const vis = getTeamMeta(m.partido_info.visitante_modelo);
-          const pick = obtenerMejorPickDeportivo(m.bloque_2_deportivo_y_extracancha, loc.abbr, vis.abbr);
-          return `
-            <div onclick="abrirModalDetalle(${i})" class="py-3 flex items-center justify-between cursor-pointer hover:bg-slate-800/30 px-2 rounded-lg transition">
-              <div>
-                <div class="text-sm font-extrabold text-white">${loc.abbr} vs ${vis.abbr}</div>
-                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${pick.desc}</div>
-              </div>
-              <div class="text-right">
-                <div class="text-sm font-extrabold text-white">${pick.label}</div>
-                <div class="text-xs font-bold text-cyan-400">${pick.prob}%</div>
-              </div>
-            </div>
-          `;
-        }).join("") || `<div class="text-xs text-slate-500 py-2">No hay partidos programados en este momento.</div>`;
+        renderizarAuditoria();
 
-        gridDiv.innerHTML = jornadaCache.map((m, i) => renderCardPartidoCompacta(m, i)).join("");
-
+        // Noticias
         const newsDiv = document.getElementById("noticiasListContainer");
         const allNews = dataLiga.noticias_liga || [];
         newsDiv.innerHTML = allNews.map(n => `
@@ -1074,6 +1249,7 @@
           </div>
         `).join("") || `<div class="text-xs text-slate-500 py-4">Sin noticias recientes disponibles.</div>`;
 
+        // Tabla Equipos
         const tbody = document.getElementById("tablaEquiposBody");
         const tabla = dataLiga.tabla_posiciones || [];
         tbody.innerHTML = tabla.map(t => `
