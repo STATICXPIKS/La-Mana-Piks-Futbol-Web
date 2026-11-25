@@ -47,7 +47,7 @@
     <!-- Estado de Carga -->
     <div id="loader" class="text-center py-12">
       <div class="inline-block w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-      <p class="text-slate-300 font-medium">Descargando estadísticas reales, cuotas y noticias de la Premier League...</p>
+      <p class="text-slate-300 font-medium">Descargando estadísticas reales, cuotas, tabla y noticias de la Premier League...</p>
       <p class="text-xs text-slate-500 mt-1">(Si el servidor gratuito en Render estaba dormido, puede tardar ~40 segundos en despertar)</p>
     </div>
 
@@ -64,7 +64,6 @@
       "Man United", "Newcastle", "Nott'm Forest", "Sunderland", "Tottenham"
     ];
 
-    // Llenar selectores
     const selL = document.getElementById("selectLocal");
     const selV = document.getElementById("selectVisita");
     EQUIPOS_PL.forEach(eq => {
@@ -78,6 +77,9 @@
       const hist = deportivo.estadisticas_historicas_y_forma;
       const extra = deportivo.factores_extra_cancha;
       const tact = deportivo.estilos_de_juego_y_neutralizacion;
+      const tempAvg = hist.promedios_goles_temporada_completa || {};
+      const h2h = hist.h2h_ultimos_10 || {};
+      const tabla = extra.presion_tabla_y_clasificacion || {};
 
       const cuotasHtml = mercado.probabilidad_implicita_justa_pct
         ? `
@@ -111,11 +113,21 @@
         </li>`
       ).join("") || `<li class="text-xs text-slate-500">Sin cierres históricos recientes en Premier League</li>`;
 
+      const h2hDuelosHtml = (h2h.ultimos_duelos || []).map(d =>
+        `<span class="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xs font-mono">
+          ${d.fecha}: ${d.local} <strong class="text-white">${d.marcador}</strong> ${d.visitante}
+        </span>`
+      ).join("") || `<span class="text-xs text-slate-500">Sin duelos directos recientes</span>`;
+
       const marcadoresHtml = mc.marcadores_exactos_mas_probables.map(m =>
         `<span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono">
           <strong class="text-emerald-400">${m.marcador}</strong> (${m.probabilidad_pct}%)
         </span>`
       ).join("");
+
+      const bajasLocal = (extra.bajas_y_lesiones_reportadas?.local || []).join(", ") || "Sin bajas reportadas";
+      const bajasVisita = (extra.bajas_y_lesiones_reportadas?.visitante || []).join(", ") || "Sin bajas reportadas";
+      const exJugadores = (extra.jugadores_pasado_en_ambos_equipos || []).map(j => `${j.jugador} (${j.equipo_actual}, ex ${j.ex_equipo})`).join(", ") || "Ninguno detectado";
 
       const noticiasLocal = (extra.prensa_lesiones_y_rumores_rss?.noticias_y_alertas_local || []).map(n =>
         `<li class="text-xs text-slate-300">• [${n.fuente}] ${n.titular}</li>`
@@ -135,7 +147,7 @@
             </div>
             <div class="text-right text-xs text-slate-300 space-y-1">
               <div>Récord Temporada: <span class="font-semibold text-white">${info.record_local || "-"}</span> vs <span class="font-semibold text-white">${info.record_visita || "-"}</span></div>
-              <div class="text-indigo-300">${extra.rivalidad?.nombre_rivalidad || ""}</div>
+              <div class="text-indigo-300 font-medium">${extra.rivalidad?.nombre_rivalidad || ""}</div>
             </div>
           </div>
 
@@ -206,22 +218,44 @@
                 <div class="flex flex-wrap gap-2">${marcadoresHtml}</div>
               </div>
 
-              <!-- Estadísticas Reales (Últimos 10, Local/Visita y Tiros a Puerta) -->
+              <!-- Presión en Tabla de Posiciones -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
                 <div>
-                  <div class="font-bold text-emerald-400 mb-1">${info.local} (Local)</div>
+                  <span class="text-slate-400 block">Tabla ${info.local}:</span>
+                  <strong class="text-white">Puesto #${tabla.local?.posicion_actual || "-"} (${tabla.local?.puntos || 0} pts)</strong>
+                  <div class="text-emerald-300 mt-0.5">${tabla.local?.contexto_clasificacion || ""}</div>
+                </div>
+                <div>
+                  <span class="text-slate-400 block">Tabla ${info.visitante}:</span>
+                  <strong class="text-white">Puesto #${tabla.visitante?.posicion_actual || "-"} (${tabla.visitante?.puntos || 0} pts)</strong>
+                  <div class="text-indigo-300 mt-0.5">${tabla.visitante?.contexto_clasificacion || ""}</div>
+                </div>
+              </div>
+
+              <!-- Estadísticas Reales (Temporada, Últimos 10, Local/Visita y Tiros a Puerta) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
+                <div class="space-y-1">
+                  <div class="font-bold text-emerald-400">${info.local} (Local)</div>
+                  <div>Prom. Goles Local Temp: <span class="text-white">${tempAvg.local?.promedio_goles_anotados_local_temporada ?? "-"} favor / ${tempAvg.local?.promedio_goles_recibidos_local_temporada ?? "-"} contra</span></div>
                   <div>Racha últ. 10: <span class="font-mono text-white">${hist.local_general_10?.racha_ultimos_10 || "-"}</span> (${hist.local_general_10?.puntos_ultimos_10 || 0} pts)</div>
                   <div>En Casa últ. 10: <span class="text-white">${hist.local_en_casa_10?.record_ultimos_10 || "-"}</span></div>
                   <div>Tiros a puerta casa: <span class="text-white">${hist.local_en_casa_10?.promedio_tiros_puerta_favor || 0} favor / ${hist.local_en_casa_10?.promedio_tiros_puerta_contra || 0} contra</span></div>
                   <div>Descanso real: <span class="text-white">${hist.local_general_10?.dias_descanso_reales || "-"} días</span></div>
                 </div>
-                <div>
-                  <div class="font-bold text-indigo-400 mb-1">${info.visitante} (Visita)</div>
+                <div class="space-y-1">
+                  <div class="font-bold text-indigo-400">${info.visitante} (Visita)</div>
+                  <div>Prom. Goles Visita Temp: <span class="text-white">${tempAvg.visitante?.promedio_goles_anotados_visita_temporada ?? "-"} favor / ${tempAvg.visitante?.promedio_goles_recibidos_visita_temporada ?? "-"} contra</span></div>
                   <div>Racha últ. 10: <span class="font-mono text-white">${hist.visita_general_10?.racha_ultimos_10 || "-"}</span> (${hist.visita_general_10?.puntos_ultimos_10 || 0} pts)</div>
                   <div>De Visita últ. 10: <span class="text-white">${hist.visita_fuera_10?.record_ultimos_10 || "-"}</span></div>
                   <div>Tiros a puerta fuera: <span class="text-white">${hist.visita_fuera_10?.promedio_tiros_puerta_favor || 0} favor / ${hist.visita_fuera_10?.promedio_tiros_puerta_contra || 0} contra</span></div>
                   <div>Descanso real: <span class="text-white">${hist.visita_general_10?.dias_descanso_reales || "-"} días</span></div>
                 </div>
+              </div>
+
+              <!-- Historial H2H -->
+              <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-2">
+                <div class="font-bold text-slate-200">Historial Directo H2H (${h2h.partidos_encontrados || 0} juegos): <span class="text-emerald-400">${h2h.victorias_local_actual || 0}G Local</span> • <span class="text-slate-400">${h2h.empates || 0}E</span> • <span class="text-indigo-400">${h2h.victorias_visita_actual || 0}G Visita</span></div>
+                <div class="flex flex-wrap gap-1.5">${h2hDuelosHtml}</div>
               </div>
 
               <!-- Estilos de Juego y Neutralización -->
@@ -232,15 +266,20 @@
                 <div class="text-slate-300 italic pt-1">${tact?.lectura_choque_estilos || ""}</div>
               </div>
 
-              <!-- Prensa y Alertas Extra-Cancha -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
-                <div>
-                  <span class="font-semibold text-slate-400 block mb-1">Noticias / Alertas ${info.local}:</span>
-                  <ul class="space-y-1">${noticiasLocal}</ul>
-                </div>
-                <div>
-                  <span class="font-semibold text-slate-400 block mb-1">Noticias / Alertas ${info.visitante}:</span>
-                  <ul class="space-y-1">${noticiasVisita}</ul>
+              <!-- Bajas, Ley del Ex y Prensa -->
+              <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-2">
+                <div><strong class="text-rose-400">Bajas/Lesiones Local:</strong> ${bajasLocal}</div>
+                <div><strong class="text-rose-400">Bajas/Lesiones Visita:</strong> ${bajasVisita}</div>
+                <div><strong class="text-amber-300">Jugadores con pasado en ambos clubes:</strong> ${exJugadores}</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+                  <div>
+                    <span class="font-semibold text-slate-400 block mb-1">Noticias ${info.local}:</span>
+                    <ul class="space-y-1">${noticiasLocal}</ul>
+                  </div>
+                  <div>
+                    <span class="font-semibold text-slate-400 block mb-1">Noticias ${info.visitante}:</span>
+                    <ul class="space-y-1">${noticiasVisita}</ul>
+                  </div>
                 </div>
               </div>
 
@@ -295,7 +334,6 @@
       }
     }
 
-    // Cargar automáticamente al abrir
     cargarJornada();
   </script>
 </body>
