@@ -999,7 +999,6 @@
       return formatearEtiquetaDesdeClave(obtenerClaveFecha(isoStr));
     }
 
-    // ================= SELECCIÓN INTELIGENTE MULTI-MERCADO (IDÉNTICA AL BACKEND) =================
     function obtenerMejorPickDeportivo(deportivo, locAbbr, visAbbr) {
       const probs = deportivo.simulacion_monte_carlo.probabilidades_1X2_pct;
       const goles = deportivo.simulacion_monte_carlo.mercados_goles_pct;
@@ -1270,33 +1269,18 @@
       document.getElementById("modalDetalle").classList.add("hidden");
     }
 
-    // ================= FETCH CON LIMITE DE TIEMPO Y REINTENTO AUTOMATICO =================
-    async function fetchConTimeout(url, ms = 25000) {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), ms);
-      try {
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(id);
-        return response;
-      } catch (err) {
-        clearTimeout(id);
-        throw err;
-      }
-    }
-
+    // ================= CARGA LIMPIA SIN CORTAR CONEXION EN MARCHA =================
     async function cargarTodoPremier(intento = 1) {
       const loader = document.getElementById("leagueLoader");
       loader.classList.remove("hidden");
       loader.innerHTML = `
         <div class="inline-block w-10 h-10 border-4 border-[#00FF7F] border-t-transparent rounded-full animate-spin mb-3"></div>
         <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando fechas reales de la jornada y probabilidades Dixon-Coles...</p>
-        <p class="text-xs text-slate-400 mt-1">${intento > 1 ? `Despertando servidor en Render y calculando simulaciones (intento ${intento} de 6)...` : "Conectando con motor cuantitativo..."}</p>
+        <p class="text-xs text-slate-400 mt-1">${intento > 1 ? `Esperando respuesta del motor cuantitativo (intento ${intento})...` : "Conectando con motor cuantitativo..."}</p>
       `;
 
       try {
-        await fetchConTimeout(`${API_BASE}/`, 12000).catch(() => {});
-
-        const resJornada = await fetchConTimeout(`${API_BASE}/api/premier/jornada`, 28000);
+        const resJornada = await fetch(`${API_BASE}/api/premier/jornada`);
         if (!resJornada.ok) throw new Error(`HTTP ${resJornada.status}`);
         const dataJornada = await resJornada.json();
         jornadaCache = Array.isArray(dataJornada.partidos) ? dataJornada.partidos : [];
@@ -1318,8 +1302,8 @@
         cambiarTab("partidos");
 
         const [dataLiga, dataAuditoria] = await Promise.all([
-          fetchConTimeout(`${API_BASE}/api/premier/liga-info`, 20000).then(r => r.json()).catch(() => ({ tabla_posiciones: [], noticias_liga: [] })),
-          fetchConTimeout(`${API_BASE}/api/premier/auditoria`, 20000).then(r => r.json()).catch(() => ({ partidos: [] }))
+          fetch(`${API_BASE}/api/premier/liga-info`).then(r => r.json()).catch(() => ({ tabla_posiciones: [], noticias_liga: [] })),
+          fetch(`${API_BASE}/api/premier/auditoria`).then(r => r.json()).catch(() => ({ partidos: [] }))
         ]);
 
         auditoriaCache = dataAuditoria || { partidos: [] };
@@ -1370,13 +1354,13 @@
         `).join("");
 
       } catch (err) {
-        if (intento < 6) {
+        if (intento < 5) {
           setTimeout(() => cargarTodoPremier(intento + 1), 3000);
           return;
         }
         loader.innerHTML = `
           <div class="max-w-md mx-auto bg-[#0b120e] border border-rose-500/40 rounded-2xl p-6 space-y-3">
-            <div class="text-rose-400 text-sm font-bold">El servidor en Render tardó demasiado en despertar.</div>
+            <div class="text-rose-400 text-sm font-bold">No se pudo conectar con el servidor (${err.message}).</div>
             <button onclick="cargarTodoPremier(1)" class="px-5 py-2 rounded-full bg-neon text-slate-950 font-black text-xs uppercase tracking-wider">
               Reintentar ahora ↻
             </button>
