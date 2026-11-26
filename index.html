@@ -1269,21 +1269,27 @@
       document.getElementById("modalDetalle").classList.add("hidden");
     }
 
-    // ================= CARGA LIMPIA SIN CORTAR CONEXION EN MARCHA =================
+    // ================= CARGA NO-BLOQUEANTE CON POLLING AUTOMATICO =================
     async function cargarTodoPremier(intento = 1) {
       const loader = document.getElementById("leagueLoader");
       loader.classList.remove("hidden");
       loader.innerHTML = `
         <div class="inline-block w-10 h-10 border-4 border-[#00FF7F] border-t-transparent rounded-full animate-spin mb-3"></div>
         <p class="text-neon text-sm font-semibold tracking-wide">Sincronizando fechas reales de la jornada y probabilidades Dixon-Coles...</p>
-        <p class="text-xs text-slate-400 mt-1">${intento > 1 ? `Esperando respuesta del motor cuantitativo (intento ${intento})...` : "Conectando con motor cuantitativo..."}</p>
+        <p class="text-xs text-slate-400 mt-1">${intento > 1 ? `Motor cuantitativo calculando simulaciones Monte Carlo en segundo plano (ciclo ${intento})...` : "Conectando con motor cuantitativo..."}</p>
       `;
 
       try {
         const resJornada = await fetch(`${API_BASE}/api/premier/jornada`);
         if (!resJornada.ok) throw new Error(`HTTP ${resJornada.status}`);
         const dataJornada = await resJornada.json();
-        jornadaCache = Array.isArray(dataJornada.partidos) ? dataJornada.partidos : [];
+
+        if (dataJornada.cargando || !Array.isArray(dataJornada.partidos) || dataJornada.partidos.length === 0) {
+          setTimeout(() => cargarTodoPremier(intento + 1), 4000);
+          return;
+        }
+
+        jornadaCache = dataJornada.partidos;
 
         partidosPorFecha = {};
         jornadaCache.forEach((m, idx) => {
@@ -1354,8 +1360,8 @@
         `).join("");
 
       } catch (err) {
-        if (intento < 5) {
-          setTimeout(() => cargarTodoPremier(intento + 1), 3000);
+        if (intento < 12) {
+          setTimeout(() => cargarTodoPremier(intento + 1), 4000);
           return;
         }
         loader.innerHTML = `
